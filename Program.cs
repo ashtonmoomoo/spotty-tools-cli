@@ -27,15 +27,18 @@ class Program
 
     switch (thisArg)
     {
-      case "login": { break; }
+      case "login":
+        {
+          Spotify.Client client = new Spotify.Client();
+          client.Login();
+          return 0;
+        }
       default:
         {
-          Console.WriteLine(String.Format("`{0}` is not a supported argument.", thisArg));
+          Console.WriteLine($"`{thisArg}` is not a supported argument.");
           arguments.ShowHelp();
           return 1;
         }
     }
-
-    return 0;
   }
 }
