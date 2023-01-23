@@ -3,6 +3,42 @@ namespace Utils
   using System.Runtime.InteropServices;
   using System.Diagnostics;
 
+  namespace Web
+  {
+    using System;
+    using System.Net;
+    class HttpServer
+    {
+      private HttpListener _listener;
+      private string _localAddress = Utils.Env.GetEnvVarOrDefault("LOCAL_ADDRESS", "http://localhost");
+      private int _port = int.Parse(Utils.Env.GetEnvVarOrDefault("PORT", "3002"));
+
+      public HttpServer()
+      {
+        _listener = new HttpListener();
+        _listener.Prefixes.Add($"{_localAddress}:{_port}/");
+      }
+
+      public string StartAndListenOnce()
+      {
+        _listener.Start();
+
+        Console.WriteLine("Waiting for request...");
+        HttpListenerContext context = _listener.GetContext();
+        HttpListenerRequest request = context.Request;
+        string? token = request.QueryString.Get("code");
+        _listener.Stop();
+
+        if (String.IsNullOrEmpty(token))
+        {
+          throw new Exception("Token missing");
+        }
+
+        return token;
+      }
+    }
+  }
+
   class Browser
   {
     class UnsupportedBrowserException : Exception { };
