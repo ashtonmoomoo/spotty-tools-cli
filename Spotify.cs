@@ -41,15 +41,6 @@ namespace Spotify
       ExchangeToken();
     }
 
-    private class AccessTokenResponse
-    {
-      public string? access_token { get; set; }
-      public string? token_type { get; set; }
-      public int? expires_in { get; set; }
-      public string? refresh_token { get; set; }
-      public string? scope { get; set; }
-    }
-
     private HttpRequestMessage ConstructRequest()
     {
       var postBody = new Dictionary<string, string>() {
@@ -68,13 +59,13 @@ namespace Spotify
       return request;
     }
 
-    private AccessTokenResponse ParseTokenResponse(HttpResponseMessage response)
+    private ResponseType.AccessToken ParseTokenResponse(HttpResponseMessage response)
     {
       Stream contentStream = response.Content.ReadAsStream();
       StreamReader readStream = new StreamReader(contentStream, System.Text.Encoding.UTF8);
       string content = readStream.ReadToEnd()!;
 
-      return System.Text.Json.JsonSerializer.Deserialize<AccessTokenResponse>(content)!;
+      return System.Text.Json.JsonSerializer.Deserialize<ResponseType.AccessToken>(content)!;
     }
 
     private void ExchangeToken()
@@ -93,6 +84,18 @@ namespace Spotify
       Utils.Web.HttpServer server = new Utils.Web.HttpServer();
       var (token, state) = server.StartAndListenOnce();
       return (token, state);
+    }
+  }
+
+  namespace ResponseType
+  {
+    public class AccessToken
+    {
+      public string? access_token { get; set; }
+      public string? token_type { get; set; }
+      public int? expires_in { get; set; }
+      public string? refresh_token { get; set; }
+      public string? scope { get; set; }
     }
   }
 }
