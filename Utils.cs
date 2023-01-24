@@ -71,12 +71,7 @@ namespace Utils
     {
       string? envVar = Environment.GetEnvironmentVariable(name);
 
-      if (envVar == null)
-      {
-        return defaultVar;
-      }
-
-      return name;
+      return envVar ?? defaultVar;
     }
 
     class MissingEnvVarException : Exception
