@@ -6,7 +6,12 @@ namespace Spotify
     public static readonly string ACCOUNTS_BASE_URL = "https://accounts.spotify.com";
   }
 
-  class Client
+  interface ISpotifyClient
+  {
+    public void Login();
+  }
+
+  class Client : ISpotifyClient
   {
     private readonly HttpClient httpClient = new HttpClient();
 
