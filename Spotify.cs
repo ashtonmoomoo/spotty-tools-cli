@@ -26,16 +26,10 @@ namespace Spotify
       this.httpClient.BaseAddress = new Uri(Spotify.Constants.ACCOUNTS_BASE_URL);
     }
 
-    class InvalidOAuthStateException : Exception { };
-
     public void Login()
     {
       Utils.Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
       var (token, state) = GetTokenAndState();
-      if (state != this._state)
-      {
-        throw new InvalidOAuthStateException();
-      }
 
       this._authToken = token;
       ExchangeToken();
@@ -83,8 +77,18 @@ namespace Spotify
     {
       Utils.Web.HttpServer server = new Utils.Web.HttpServer();
       var (token, state) = server.StartAndListenOnce();
+      if (state != this._state)
+      {
+        throw new CustomException.InvalidOAuthStateException();
+      }
+
       return (token, state);
     }
+  }
+
+  namespace CustomException
+  {
+    class InvalidOAuthStateException : Exception { };
   }
 
   namespace ResponseType
