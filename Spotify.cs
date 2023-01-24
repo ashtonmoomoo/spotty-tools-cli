@@ -22,7 +22,7 @@ namespace Spotify
     private string _state;
     private string _scopes = "user-read-private";
     private string _authToken = String.Empty;
-    private string _accessToken = String.Empty;
+    private ResponseType.AccessToken? _accessTokenResponse;
 
     public Client()
     {
@@ -38,6 +38,8 @@ namespace Spotify
 
       this._authToken = token;
       ExchangeToken();
+      CommitSession();
+      Success();
     }
 
     private HttpRequestMessage ConstructRequest()
@@ -74,8 +76,20 @@ namespace Spotify
       HttpResponseMessage response = this.httpClient.Send(request);
       response.EnsureSuccessStatusCode();
 
-      var tokenResponse = ParseTokenResponse(response);
-      this._accessToken = tokenResponse.access_token!;
+      this._accessTokenResponse = ParseTokenResponse(response);
+    }
+
+    private void Success()
+    {
+      Console.WriteLine("Logged in!");
+    }
+
+    // Help persist access across sessions
+    private void CommitSession()
+    {
+      var sessionJsonString = System.Text.Json.JsonSerializer.Serialize(this._accessTokenResponse);
+      string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
+      Utils.FileSystem.Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
     }
 
     private (string, string) GetTokenAndState()

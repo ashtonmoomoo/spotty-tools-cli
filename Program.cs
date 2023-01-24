@@ -10,8 +10,20 @@ class Program
     return arguments;
   }
 
+  // Create storage/config directory if it doesn't already exist
+  static void OnStartUp()
+  {
+    string location = Utils.FileSystem.Storage.GetStorageLocation();
+    if (!Directory.Exists(location))
+    {
+      Directory.CreateDirectory(location);
+    }
+  }
+
   static int Main(string[] args)
   {
+    OnStartUp();
+
     ProgramArguments arguments = GetProgramArguments();
 
     if (args.Length == 0)

@@ -103,4 +103,31 @@ namespace Utils
       return System.Convert.ToBase64String(textBytes);
     }
   }
+
+  namespace FileSystem
+  {
+    using System.Runtime.InteropServices;
+
+    class Storage
+    {
+      public static string GetStorageLocation()
+      {
+        string homeDir = Utils.Env.RequireEnvVar("HOME");
+        return Utils.Env.GetEnvVarOrDefault("STORAGE_LOCATION", $"{homeDir}/.spotty");
+      }
+    }
+
+    class Write
+    {
+      public static void WriteToFile(string path, string content)
+      {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+          throw new Exception("Writing on Windows isn't implemented yet");
+        }
+
+        File.WriteAllText(path, content);
+      }
+    }
+  }
 }
