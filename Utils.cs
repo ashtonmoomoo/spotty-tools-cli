@@ -19,7 +19,7 @@ namespace Utils
         _listener.Prefixes.Add($"{_localAddress}:{_port}/");
       }
 
-      public string StartAndListenOnce()
+      public (string, string) StartAndListenOnce()
       {
         _listener.Start();
 
@@ -27,14 +27,15 @@ namespace Utils
         HttpListenerContext context = _listener.GetContext();
         HttpListenerRequest request = context.Request;
         string? token = request.QueryString.Get("code");
+        string? state = request.QueryString.Get("state");
         _listener.Stop();
 
-        if (String.IsNullOrEmpty(token))
+        if (String.IsNullOrEmpty(token) || String.IsNullOrEmpty(state))
         {
-          throw new Exception("Token missing");
+          throw new Exception("Token or state missing");
         }
 
-        return token;
+        return (token, state);
       }
     }
   }
@@ -91,6 +92,15 @@ namespace Utils
       }
 
       return envVar;
+    }
+  }
+
+  class Encoding
+  {
+    public static string Base64Encode(string text)
+    {
+      var textBytes = System.Text.Encoding.UTF8.GetBytes(text);
+      return System.Convert.ToBase64String(textBytes);
     }
   }
 }
