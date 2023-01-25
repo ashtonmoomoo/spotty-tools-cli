@@ -83,7 +83,14 @@ namespace Spotify
       HttpResponseMessage response = this.httpClient.Send(request);
       response.EnsureSuccessStatusCode();
 
-      this._accessTokenResponse = ParseTokenResponse(response);
+      var tokenResponse = ParseTokenResponse(response);
+
+      var lifetime = (double)(tokenResponse.expires_in != null ? tokenResponse.expires_in : 3600);
+      var expiry = DateTime.UtcNow;
+      expiry.AddSeconds(lifetime);
+      tokenResponse.expires_at = expiry;
+
+      this._accessTokenResponse = tokenResponse;
     }
 
     private void Success()
@@ -136,6 +143,7 @@ namespace Spotify
       public string? access_token { get; set; }
       public string? token_type { get; set; }
       public int? expires_in { get; set; }
+      public DateTime? expires_at { get; set; }
       public string? refresh_token { get; set; }
       public string? scope { get; set; }
     }
