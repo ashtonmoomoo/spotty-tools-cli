@@ -157,7 +157,9 @@ namespace Spotify
 
       AdornTokenResponseWithExpiryTime(tokenResponse);
 
+      var refreshToken = this._accessTokenResponse?.refresh_token;
       this._accessTokenResponse = tokenResponse;
+      this._accessTokenResponse.refresh_token = refreshToken;
 
       CommitSession();
     }
