@@ -9,6 +9,7 @@ namespace Spotify
   interface ISpotifyClient
   {
     public void Login();
+    public bool LoadSessionIfExists();
   }
 
   class Client : ISpotifyClient
@@ -33,14 +34,6 @@ namespace Spotify
 
     public void Login()
     {
-      ResponseType.AccessToken? existingSession = LoadSessionIfExists();
-      if (existingSession != null)
-      {
-        this._accessTokenResponse = existingSession;
-        Success();
-        return;
-      }
-
       Utils.Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
 
       GetAuthToken();
@@ -106,16 +99,29 @@ namespace Spotify
       Utils.FileSystem.Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
     }
 
-    private ResponseType.AccessToken? LoadSessionIfExists()
+    public bool LoadSessionIfExists()
     {
       string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
       string? sessionJson = Utils.FileSystem.Read.ReadFile($"{storageDir}/.session");
       if (sessionJson == null)
       {
-        return null;
+        NoSessionFound();
+        return false;
       }
 
-      return System.Text.Json.JsonSerializer.Deserialize<ResponseType.AccessToken>(sessionJson);
+      ResponseType.AccessToken? existingSession = System.Text.Json.JsonSerializer.Deserialize<ResponseType.AccessToken>(sessionJson);
+      if (existingSession != null)
+      {
+        this._accessTokenResponse = existingSession;
+      }
+
+      return true;
+    }
+
+    private void NoSessionFound()
+    {
+      Console.WriteLine("No existing spotty session found");
+      Console.WriteLine("Run the `login` command to create one");
     }
 
     private void GetAuthToken()

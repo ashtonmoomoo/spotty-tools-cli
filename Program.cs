@@ -14,6 +14,9 @@ class Initialisation
 
 class Program
 {
+  private static Spotify.Client _client = new Spotify.Client();
+  private static bool _isLoggedIn = false;
+
   static ProgramArguments GetProgramArguments()
   {
     ProgramArguments arguments = new ProgramArguments();
@@ -26,6 +29,7 @@ class Program
   static void OnStartUp()
   {
     Initialisation.CreateStorageLocationIfRequired();
+    _isLoggedIn = _client.LoadSessionIfExists();
   }
 
   static int Main(string[] args)
@@ -49,8 +53,15 @@ class Program
     {
       case "login":
         {
-          Spotify.Client client = new Spotify.Client();
-          client.Login();
+          if (!_isLoggedIn)
+          {
+            _client.Login();
+          }
+          else
+          {
+            Console.WriteLine("Already logged in!");
+          }
+
           return 0;
         }
       default:
