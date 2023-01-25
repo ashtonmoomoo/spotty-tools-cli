@@ -1,3 +1,9 @@
+using Application.Common.Utilities.Env;
+using Application.Common.Utilities.Web;
+using Application.Common.Utilities.Encoding;
+using Application.Common.Utilities.FileSystem;
+using Application.Common.Utilities.Server;
+
 namespace Spotify
 {
   class Constants
@@ -16,9 +22,9 @@ namespace Spotify
   {
     private readonly HttpClient httpClient = new HttpClient();
 
-    private string _clientId = Utils.Env.RequireEnvVar("SPOTIFY_CLIENT_ID");
-    private string _clientSecret = Utils.Env.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
-    private string _redirectUri = Utils.Env.RequireEnvVar("SPOTIFY_REDIRECT_URI");
+    private string _clientId = Variables.RequireEnvVar("SPOTIFY_CLIENT_ID");
+    private string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
+    private string _redirectUri = Variables.RequireEnvVar("SPOTIFY_REDIRECT_URI");
     private string _responseType = "code";
     private string _state;
     private string _scopes = "user-read-private";
@@ -34,7 +40,7 @@ namespace Spotify
 
     public void Login()
     {
-      Utils.Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
+      Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
 
       GetAuthToken();
       ExchangeToken();
@@ -51,7 +57,7 @@ namespace Spotify
       };
 
       string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
-      var encodedSecret = Utils.Encoding.Base64Encode(toEncode);
+      var encodedSecret = Base64.Encode(toEncode);
 
       var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
       request.Content = new FormUrlEncodedContent(postBody);
@@ -100,14 +106,14 @@ namespace Spotify
     private void CommitSession()
     {
       var sessionJsonString = System.Text.Json.JsonSerializer.Serialize(this._accessTokenResponse);
-      string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
-      Utils.FileSystem.Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
+      string storageDir = Storage.GetStorageLocation();
+      Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
     }
 
     public bool LoadSessionIfExists()
     {
-      string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
-      string? sessionJson = Utils.FileSystem.Read.ReadFile($"{storageDir}/.session");
+      string storageDir = Storage.GetStorageLocation();
+      string? sessionJson = Read.ReadFile($"{storageDir}/.session");
       if (sessionJson == null)
       {
         NoSessionFound();
@@ -137,7 +143,7 @@ namespace Spotify
       };
 
       string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
-      var encodedSecret = Utils.Encoding.Base64Encode(toEncode);
+      var encodedSecret = Base64.Encode(toEncode);
 
       var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
       request.Content = new FormUrlEncodedContent(postBody);
@@ -172,7 +178,7 @@ namespace Spotify
 
     private void GetAuthToken()
     {
-      Utils.Web.HttpServer server = new Utils.Web.HttpServer();
+      HttpServer server = new HttpServer();
       var (token, state) = server.StartAndListenOnce();
       if (state != this._state)
       {

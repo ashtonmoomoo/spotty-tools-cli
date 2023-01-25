@@ -1,10 +1,11 @@
 ﻿using Arguments;
+using Application.Common.Utilities.FileSystem;
 
 class Initialisation
 {
   public static void CreateStorageLocationIfRequired()
   {
-    string location = Utils.FileSystem.Storage.GetStorageLocation();
+    string location = Storage.GetStorageLocation();
     if (!Directory.Exists(location))
     {
       Directory.CreateDirectory(location);
