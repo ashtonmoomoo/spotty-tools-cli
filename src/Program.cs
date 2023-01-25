@@ -1,7 +1,7 @@
-﻿using Arguments;
+﻿using Application.CLI.Arguments;
 using Application.Common.Utilities.FileSystem;
 
-class Initialisation
+public class Initialisation
 {
   public static void CreateStorageLocationIfRequired()
   {
@@ -13,7 +13,7 @@ class Initialisation
   }
 }
 
-class Program
+public class Program
 {
   private static Spotify.Client _client = new Spotify.Client();
   private static bool _isLoggedIn = false;

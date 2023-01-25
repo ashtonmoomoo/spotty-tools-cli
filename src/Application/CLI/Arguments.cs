@@ -1,4 +1,4 @@
-namespace Arguments;
+namespace Application.CLI.Arguments;
 
 public class Argument
 {
@@ -14,7 +14,7 @@ public class Argument
   }
 }
 
-class ProgramArguments
+public class ProgramArguments
 {
   public List<Argument> arguments = new List<Argument>();
 
@@ -45,7 +45,7 @@ class ProgramArguments
   }
 }
 
-class ArgumentParser
+public class ArgumentParser
 {
   private List<string> args;
 
