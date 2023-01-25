@@ -33,6 +33,14 @@ namespace Spotify
 
     public void Login()
     {
+      ResponseType.AccessToken? existingSession = LoadSessionIfExists();
+      if (existingSession != null)
+      {
+        this._accessTokenResponse = existingSession;
+        Success();
+        return;
+      }
+
       Utils.Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
 
       GetAuthToken();
@@ -89,6 +97,18 @@ namespace Spotify
       var sessionJsonString = System.Text.Json.JsonSerializer.Serialize(this._accessTokenResponse);
       string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
       Utils.FileSystem.Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
+    }
+
+    private ResponseType.AccessToken? LoadSessionIfExists()
+    {
+      string storageDir = Utils.FileSystem.Storage.GetStorageLocation();
+      string? sessionJson = Utils.FileSystem.Read.ReadFile($"{storageDir}/.session");
+      if (sessionJson == null)
+      {
+        return null;
+      }
+
+      return System.Text.Json.JsonSerializer.Deserialize<ResponseType.AccessToken>(sessionJson);
     }
 
     private void GetAuthToken()

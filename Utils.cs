@@ -117,6 +117,21 @@ namespace Utils
       }
     }
 
+    class Read
+    {
+      public static string? ReadFile(string path)
+      {
+        try
+        {
+          return File.ReadAllText(path);
+        }
+        catch (FileNotFoundException)
+        {
+          return null;
+        }
+      }
+    }
+
     class Write
     {
       public static void WriteToFile(string path, string content)
