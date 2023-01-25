@@ -78,12 +78,17 @@ namespace Spotify
 
       var tokenResponse = ParseTokenResponse(response);
 
+      AdornTokenResponseWithExpiryTime(tokenResponse);
+
+      this._accessTokenResponse = tokenResponse;
+    }
+
+    private void AdornTokenResponseWithExpiryTime(ResponseType.AccessToken tokenResponse)
+    {
       var lifetime = (double)(tokenResponse.expires_in != null ? tokenResponse.expires_in : 3600);
       var expiry = DateTime.UtcNow;
       expiry.AddSeconds(lifetime);
       tokenResponse.expires_at = expiry;
-
-      this._accessTokenResponse = tokenResponse;
     }
 
     private void Success()
@@ -116,6 +121,45 @@ namespace Spotify
       }
 
       return true;
+    }
+
+    private HttpRequestMessage ConstructRefreshRequest()
+    {
+      var refreshToken = this._accessTokenResponse?.refresh_token;
+      if (refreshToken == null)
+      {
+        throw new Exception("No refresh token found!");
+      }
+
+      var postBody = new Dictionary<string, string>() {
+        { "grant_type", "refresh_token" },
+        { "refresh_token", refreshToken },
+      };
+
+      string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
+      var encodedSecret = Utils.Encoding.Base64Encode(toEncode);
+
+      var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
+      request.Content = new FormUrlEncodedContent(postBody);
+      request.Headers.Add("Authorization", $"Basic {encodedSecret}");
+
+      return request;
+    }
+
+    public void DoTokenRefresh()
+    {
+      var request = ConstructRefreshRequest();
+
+      var response = this.httpClient.Send(request);
+      response.EnsureSuccessStatusCode();
+
+      var tokenResponse = ParseTokenResponse(response);
+
+      AdornTokenResponseWithExpiryTime(tokenResponse);
+
+      this._accessTokenResponse = tokenResponse;
+
+      CommitSession();
     }
 
     private void NoSessionFound()

@@ -30,6 +30,10 @@ class Program
   {
     Initialisation.CreateStorageLocationIfRequired();
     _isLoggedIn = _client.LoadSessionIfExists();
+    if (_isLoggedIn)
+    {
+      _client.DoTokenRefresh();
+    }
   }
 
   static int Main(string[] args)
