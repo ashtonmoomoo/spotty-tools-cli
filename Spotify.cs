@@ -34,9 +34,8 @@ namespace Spotify
     public void Login()
     {
       Utils.Browser.Open($"https://accounts.spotify.com/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
-      var (token, state) = GetTokenAndState();
 
-      this._authToken = token;
+      GetAuthToken();
       ExchangeToken();
       CommitSession();
       Success();
@@ -92,7 +91,7 @@ namespace Spotify
       Utils.FileSystem.Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
     }
 
-    private (string, string) GetTokenAndState()
+    private void GetAuthToken()
     {
       Utils.Web.HttpServer server = new Utils.Web.HttpServer();
       var (token, state) = server.StartAndListenOnce();
@@ -101,7 +100,7 @@ namespace Spotify
         throw new CustomException.InvalidOAuthStateException();
       }
 
-      return (token, state);
+      this._authToken = token;
     }
   }
 
