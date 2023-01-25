@@ -1,5 +1,17 @@
 ﻿using Arguments;
 
+class Initialisation
+{
+  public static void CreateStorageLocationIfRequired()
+  {
+    string location = Utils.FileSystem.Storage.GetStorageLocation();
+    if (!Directory.Exists(location))
+    {
+      Directory.CreateDirectory(location);
+    }
+  }
+}
+
 class Program
 {
   static ProgramArguments GetProgramArguments()
@@ -13,11 +25,7 @@ class Program
   // Create storage/config directory if it doesn't already exist
   static void OnStartUp()
   {
-    string location = Utils.FileSystem.Storage.GetStorageLocation();
-    if (!Directory.Exists(location))
-    {
-      Directory.CreateDirectory(location);
-    }
+    Initialisation.CreateStorageLocationIfRequired();
   }
 
   static int Main(string[] args)
