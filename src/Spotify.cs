@@ -128,7 +128,7 @@ namespace Spotify
       var refreshToken = this._accessTokenResponse?.refresh_token;
       if (refreshToken == null)
       {
-        throw new Exception("No refresh token found!");
+        throw new RefreshTokenMissingException();
       }
 
       var postBody = new Dictionary<string, string>() {
@@ -176,16 +176,11 @@ namespace Spotify
       var (token, state) = server.StartAndListenOnce();
       if (state != this._state)
       {
-        throw new CustomException.InvalidOAuthStateException();
+        throw new InvalidOAuthStateException();
       }
 
       this._authToken = token;
     }
-  }
-
-  namespace CustomException
-  {
-    class InvalidOAuthStateException : Exception { };
   }
 
   namespace ResponseType

@@ -46,7 +46,7 @@ namespace Utils
         string? state = request.QueryString.Get("state");
         if (String.IsNullOrEmpty(token) || String.IsNullOrEmpty(state))
         {
-          throw new Exception("Token or state missing");
+          throw new InvalidSpotifyResponseException();
         }
 
         return (token, state);
@@ -56,8 +56,6 @@ namespace Utils
 
   class Browser
   {
-    class UnsupportedBrowserException : Exception { };
-
     public static void Open(string url)
     {
       if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -74,7 +72,7 @@ namespace Utils
       }
       else
       {
-        throw new UnsupportedBrowserException();
+        throw new UnsupportedPlatformException();
       }
     }
 
@@ -88,14 +86,6 @@ namespace Utils
 
       return envVar ?? defaultVar;
     }
-
-    class MissingEnvVarException : Exception
-    {
-      public MissingEnvVarException(string message) : base(message)
-      {
-      }
-    };
-
     public static string RequireEnvVar(string name)
     {
       string? envVar = Environment.GetEnvironmentVariable(name);
@@ -107,7 +97,8 @@ namespace Utils
 
       return envVar;
     }
-  }
+  };
+
 
   class Encoding
   {
@@ -152,7 +143,7 @@ namespace Utils
       {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-          throw new Exception("Writing on Windows isn't implemented yet");
+          throw new UnsupportedPlatformException();
         }
 
         File.WriteAllText(path, content);

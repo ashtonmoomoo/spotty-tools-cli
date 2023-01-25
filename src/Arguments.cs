@@ -45,8 +45,6 @@ namespace Arguments
     }
   }
 
-  class ArgumentsLengthException : Exception { }
-
   class ArgumentParser
   {
     private List<string> args;
