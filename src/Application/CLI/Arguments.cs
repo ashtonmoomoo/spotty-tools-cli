@@ -25,22 +25,10 @@ public class ProgramArguments
 
   public void ShowHelp()
   {
-    Console.WriteLine();
-    Console.WriteLine("spotty-tools-cli");
-    Console.WriteLine();
-    Console.Write("* Command *");
-    Console.Write("\t");
-    Console.Write("* Name *");
-    Console.Write("\t");
-    Console.WriteLine("* Description *");
+    Messages.Help.Header();
     foreach (Argument arg in this.arguments)
     {
-      Console.Write(arg.aliases[0]);
-      Console.Write("\t\t");
-      Console.Write(arg.name);
-      Console.Write("\t\t");
-      Console.Write(arg.description);
-      Console.WriteLine();
+      Messages.Help.FormatArgument(arg);
     }
   }
 }

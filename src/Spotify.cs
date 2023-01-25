@@ -4,6 +4,8 @@ using Application.Common.Utilities.Encoding;
 using Application.Common.Utilities.FileSystem;
 using Application.Common.Utilities.Server;
 
+using Application.CLI.Messages;
+
 namespace Spotify
 {
   class Constants
@@ -45,7 +47,7 @@ namespace Spotify
       GetAuthToken();
       ExchangeToken();
       CommitSession();
-      Success();
+      Info.LoginSuccess();
     }
 
     private HttpRequestMessage ConstructRequest()
@@ -97,11 +99,6 @@ namespace Spotify
       tokenResponse.expires_at = expiry;
     }
 
-    private void Success()
-    {
-      Console.WriteLine("Logged in!");
-    }
-
     // Help persist access across sessions
     private void CommitSession()
     {
@@ -116,7 +113,7 @@ namespace Spotify
       string? sessionJson = Read.ReadFile($"{storageDir}/.session");
       if (sessionJson == null)
       {
-        NoSessionFound();
+        Warnings.NoSessionFound();
         return false;
       }
 
@@ -168,12 +165,6 @@ namespace Spotify
       this._accessTokenResponse.refresh_token = refreshToken;
 
       CommitSession();
-    }
-
-    private void NoSessionFound()
-    {
-      Console.WriteLine("No existing spotty session found");
-      Console.WriteLine("Run the `login` command to create one");
     }
 
     private void GetAuthToken()

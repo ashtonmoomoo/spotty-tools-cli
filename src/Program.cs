@@ -1,4 +1,5 @@
-﻿using Application.CLI.Arguments;
+﻿using Application.CLI.Messages;
+using Application.CLI.Arguments;
 using Application.Common.Utilities.FileSystem;
 
 public class Initialisation
@@ -45,8 +46,7 @@ public class Program
 
     if (args.Length == 0)
     {
-      Console.WriteLine("spotty-tools requires at least one argument!");
-      Console.WriteLine();
+      Errors.NoArguments();
       arguments.ShowHelp();
       return 1;
     }
@@ -64,14 +64,14 @@ public class Program
           }
           else
           {
-            Console.WriteLine("Already logged in!");
+            Warnings.AlreadyLoggedIn();
           }
 
           return 0;
         }
       default:
         {
-          Console.WriteLine($"`{thisArg}` is not a supported argument.");
+          Errors.UnsupportedArgument(thisArg);
           arguments.ShowHelp();
           return 1;
         }

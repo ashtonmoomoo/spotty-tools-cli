@@ -1,4 +1,5 @@
 using Application.Common.Utilities.Env;
+using Application.CLI.Messages;
 
 using System.Net;
 
@@ -31,7 +32,7 @@ class HttpServer
   {
     _listener.Start();
 
-    Console.WriteLine("Waiting for request...");
+    Info.WaitingToCompleteLogin();
     HttpListenerContext context = _listener.GetContext();
     HttpListenerRequest request = context.Request;
     HttpListenerResponse response = context.Response;
