@@ -2,10 +2,11 @@
 using Application.CLI.Arguments;
 using Application.Configuration;
 using Application.Handlers;
+using Application.Spotify;
 
 public class Program
 {
-  private static Spotify.Client _client = new Spotify.Client();
+  private static Client _client = new Client();
   private static ProgramArguments _arguments = Initialisation.GetProgramArguments();
 
   static void OnStartUp()

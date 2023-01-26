@@ -4,7 +4,7 @@ namespace Application.Handlers;
 
 public class LoginHandler
 {
-  public static int Dispatch(Spotify.Client client)
+  public static int Dispatch(Application.Spotify.Client client)
   {
     if (!client.IsLoggedIn())
     {
