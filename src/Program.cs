@@ -1,23 +1,10 @@
 ﻿using Application.CLI.Messages;
 using Application.CLI.Arguments;
-using Application.Common.Utilities.FileSystem;
-
-public class Initialisation
-{
-  public static void CreateStorageLocationIfRequired()
-  {
-    string location = Storage.GetStorageLocation();
-    if (!Directory.Exists(location))
-    {
-      Directory.CreateDirectory(location);
-    }
-  }
-}
+using Application.Configuration;
 
 public class Program
 {
   private static Spotify.Client _client = new Spotify.Client();
-  private static bool _isLoggedIn = false;
 
   static ProgramArguments GetProgramArguments()
   {
@@ -27,15 +14,9 @@ public class Program
     return arguments;
   }
 
-  // Create storage/config directory if it doesn't already exist
   static void OnStartUp()
   {
-    Initialisation.CreateStorageLocationIfRequired();
-    _isLoggedIn = _client.LoadSessionIfExists();
-    if (_isLoggedIn)
-    {
-      _client.DoTokenRefresh();
-    }
+    Initialisation.StartUp();
   }
 
   static int Main(string[] args)
@@ -58,7 +39,7 @@ public class Program
     {
       case "login":
         {
-          if (!_isLoggedIn)
+          if (!_client.IsLoggedIn())
           {
             _client.Login();
           }

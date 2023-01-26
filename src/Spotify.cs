@@ -17,12 +17,13 @@ namespace Spotify
   interface ISpotifyClient
   {
     public void Login();
-    public bool LoadSessionIfExists();
+    public bool IsLoggedIn();
   }
 
   class Client : ISpotifyClient
   {
     private readonly HttpClient httpClient = new HttpClient();
+    private bool _isLoggedIn = false;
 
     private string _clientId = Variables.RequireEnvVar("SPOTIFY_CLIENT_ID");
     private string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
@@ -38,6 +39,18 @@ namespace Spotify
       this._state = System.Guid.NewGuid().ToString();
       // Come back to this
       this.httpClient.BaseAddress = new Uri(Spotify.Constants.ACCOUNTS_BASE_URL);
+
+      var sessionExists = LoadSessionIfExists();
+      if (sessionExists)
+      {
+        this._isLoggedIn = true;
+        DoTokenRefresh();
+      }
+    }
+
+    public bool IsLoggedIn()
+    {
+      return this._isLoggedIn;
     }
 
     public void Login()
@@ -107,7 +120,7 @@ namespace Spotify
       Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
     }
 
-    public bool LoadSessionIfExists()
+    private bool LoadSessionIfExists()
     {
       string storageDir = Storage.GetStorageLocation();
       string? sessionJson = Read.ReadFile($"{storageDir}/.session");
