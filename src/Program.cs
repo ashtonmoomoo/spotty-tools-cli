@@ -1,6 +1,7 @@
 ﻿using Application.CLI.Messages;
 using Application.CLI.Arguments;
 using Application.Configuration;
+using Application.Handlers;
 
 public class Program
 {
@@ -30,16 +31,7 @@ public class Program
     {
       case "login":
         {
-          if (!_client.IsLoggedIn())
-          {
-            _client.Login();
-          }
-          else
-          {
-            Warnings.AlreadyLoggedIn();
-          }
-
-          return 0;
+          return LoginHandler.Dispatch(_client);
         }
       default:
         {

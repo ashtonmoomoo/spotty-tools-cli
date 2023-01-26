@@ -20,7 +20,7 @@ namespace Spotify
     public bool IsLoggedIn();
   }
 
-  class Client : ISpotifyClient
+  public class Client : ISpotifyClient
   {
     private readonly HttpClient httpClient = new HttpClient();
     private bool _isLoggedIn = false;
