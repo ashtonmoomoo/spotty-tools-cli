@@ -27,6 +27,8 @@ public class ClientBase
     this.httpClient = new HttpClient();
     this.httpClient.BaseAddress = new Uri(Application.Spotify.Constants.ACCOUNTS_BASE_URL);
     this._state = System.Guid.NewGuid().ToString();
+
+    PrepareSession();
   }
 
   protected void PromptUser()
@@ -41,7 +43,7 @@ public class ClientBase
     CommitSession();
   }
 
-  protected void PrepareSession()
+  private void PrepareSession()
   {
     var sessionExists = LoadSessionIfExists();
     if (sessionExists)
