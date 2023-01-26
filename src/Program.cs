@@ -34,6 +34,10 @@ public class Program
         {
           return LoginHandler.Dispatch(_client);
         }
+      case "logout":
+        {
+          return LogoutHandler.Dispatch(_client);
+        }
       default:
         {
           Errors.UnsupportedArgument(thisArg);

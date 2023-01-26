@@ -38,6 +38,11 @@ public static class Info
   {
     Console.WriteLine("Logged in!");
   }
+
+  public static void LogoutSuccess()
+  {
+    Console.WriteLine("Logged out!");
+  }
 }
 
 public static class Warnings
@@ -45,6 +50,11 @@ public static class Warnings
   public static void AlreadyLoggedIn()
   {
     Console.WriteLine("Already logged in!");
+  }
+
+  public static void NotLoggedIn()
+  {
+    Console.WriteLine("Not logged in!");
   }
 }
 

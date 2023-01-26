@@ -18,6 +18,7 @@ public class Initialisation
   {
     ProgramArguments arguments = new ProgramArguments();
     arguments.AddArgument(new List<string> { "login" }, "Login", "Login with your Spotify account.");
+    arguments.AddArgument(new List<string> { "logout" }, "Logout", "Delete your Spotify session.");
 
     return arguments;
   }

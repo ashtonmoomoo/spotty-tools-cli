@@ -43,6 +43,16 @@ public class ClientBase
     CommitSession();
   }
 
+  protected void ClearSession()
+  {
+    string storageDir = Storage.GetStorageLocation();
+    string filePath = $"{storageDir}/.session";
+    if (File.Exists(filePath))
+    {
+      File.Delete(filePath);
+    }
+  }
+
   private void PrepareSession()
   {
     var sessionExists = LoadSessionIfExists();

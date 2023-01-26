@@ -19,4 +19,9 @@ public class Client : ClientBase, ISpotifyClient
     DoOAuthHandshake();
     Info.LoginSuccess();
   }
+
+  public void Logout()
+  {
+    ClearSession();
+  }
 }
