@@ -1,4 +1,5 @@
 using Application.Common.Utilities.FileSystem;
+using Application.CLI.Arguments;
 
 namespace Application.Configuration;
 
@@ -11,6 +12,14 @@ public class Initialisation
     {
       Directory.CreateDirectory(location);
     }
+  }
+
+  public static ProgramArguments GetProgramArguments()
+  {
+    ProgramArguments arguments = new ProgramArguments();
+    arguments.AddArgument(new List<string> { "login" }, "Login", "Login with your Spotify account.");
+
+    return arguments;
   }
 
   public static void StartUp()

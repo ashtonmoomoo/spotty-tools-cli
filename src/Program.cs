@@ -5,14 +5,7 @@ using Application.Configuration;
 public class Program
 {
   private static Spotify.Client _client = new Spotify.Client();
-
-  static ProgramArguments GetProgramArguments()
-  {
-    ProgramArguments arguments = new ProgramArguments();
-    arguments.AddArgument(new List<string> { "login" }, "Login", "Login with your Spotify account.");
-
-    return arguments;
-  }
+  private static ProgramArguments _arguments = Initialisation.GetProgramArguments();
 
   static void OnStartUp()
   {
@@ -23,12 +16,10 @@ public class Program
   {
     OnStartUp();
 
-    ProgramArguments arguments = GetProgramArguments();
-
     if (args.Length == 0)
     {
       Errors.NoArguments();
-      arguments.ShowHelp();
+      _arguments.ShowHelp();
       return 1;
     }
 
@@ -53,7 +44,7 @@ public class Program
       default:
         {
           Errors.UnsupportedArgument(thisArg);
-          arguments.ShowHelp();
+          _arguments.ShowHelp();
           return 1;
         }
     }
