@@ -126,7 +126,6 @@ namespace Spotify
       string? sessionJson = Read.ReadFile($"{storageDir}/.session");
       if (sessionJson == null)
       {
-        Warnings.NoSessionFound();
         return false;
       }
 

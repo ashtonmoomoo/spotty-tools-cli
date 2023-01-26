@@ -46,12 +46,6 @@ public static class Warnings
   {
     Console.WriteLine("Already logged in!");
   }
-
-  public static void NoSessionFound()
-  {
-    Console.WriteLine("No existing spotty session found");
-    Console.WriteLine("Run the `login` command to create one");
-  }
 }
 
 public static class Errors
