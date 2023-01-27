@@ -9,14 +9,9 @@ public class Program
   private static Client _client = new Client();
   private static ProgramArguments _arguments = Initialisation.GetProgramArguments();
 
-  static void OnStartUp()
-  {
-    Initialisation.StartUp();
-  }
-
   static int Main(string[] args)
   {
-    OnStartUp();
+    Initialisation.StartUp();
 
     if (args.Length == 0)
     {
