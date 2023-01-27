@@ -19,9 +19,14 @@ class HttpServer
 
   private void SendResponse(HttpListenerResponse response)
   {
-    // Construct a response.
-    byte[] buffer = System.Text.Encoding.UTF8.GetBytes("<HTML><BODY>" + "<H1>Safe to close this window now :)</H1>" + "</BODY></HTML>");
-    // Get a response stream and write the response to it.
+    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(@"
+<html>
+<body>
+  <div style='display: flex;'>
+    <h1 style='margin: 0 auto;'>Safe to close this window now :)</h1>
+  </div>
+</body>
+</html>");
     response.ContentLength64 = buffer.Length;
     System.IO.Stream output = response.OutputStream;
     output.Write(buffer, 0, buffer.Length);
