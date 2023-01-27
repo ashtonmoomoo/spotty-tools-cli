@@ -30,6 +30,11 @@ public class Program
 
     switch (thisArg)
     {
+      case "help":
+        {
+          _arguments.ShowHelp();
+          return 0;
+        }
       case "login":
         {
           return LoginHandler.Dispatch(_client);
