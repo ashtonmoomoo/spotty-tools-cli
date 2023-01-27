@@ -20,6 +20,11 @@ public class Program
       return 1;
     }
 
+    return Dispatch(args);
+  }
+
+  private static int Dispatch(string[] args)
+  {
     ArgumentParser argParser = new ArgumentParser(args);
     string thisArg = argParser.NextArg();
 
