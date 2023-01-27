@@ -11,16 +11,12 @@ public static class Help
     Console.WriteLine();
     Console.Write("* Command *");
     Console.Write("\t");
-    Console.Write("* Name *");
-    Console.Write("\t");
     Console.WriteLine("* Description *");
   }
 
   public static void FormatArgument(Argument arg)
   {
     Console.Write(arg.aliases[0]);
-    Console.Write("\t\t");
-    Console.Write(arg.name);
     Console.Write("\t\t");
     Console.Write(arg.description);
     Console.WriteLine();

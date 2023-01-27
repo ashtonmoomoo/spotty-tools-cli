@@ -3,13 +3,11 @@ namespace Application.CLI.Arguments;
 public class Argument
 {
   public List<string> aliases = new List<string>();
-  public string name = String.Empty;
   public string description = String.Empty;
 
-  public Argument(List<string> aliases, string name, string description)
+  public Argument(List<string> aliases, string description)
   {
     this.aliases = aliases;
-    this.name = name;
     this.description = description;
   }
 }
@@ -18,9 +16,9 @@ public class ProgramArguments
 {
   public List<Argument> arguments = new List<Argument>();
 
-  public void AddArgument(List<string> aliases, string name, string description)
+  public void AddArgument(List<string> aliases, string description)
   {
-    arguments.Add(new Argument(aliases, name, description));
+    arguments.Add(new Argument(aliases, description));
   }
 
   public void ShowHelp()

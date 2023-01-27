@@ -17,9 +17,9 @@ public class Initialisation
   public static ProgramArguments GetProgramArguments()
   {
     ProgramArguments arguments = new ProgramArguments();
-    arguments.AddArgument(new List<string> { "help" }, "Help", "Show this message.");
-    arguments.AddArgument(new List<string> { "login" }, "Login", "Login with your Spotify account.");
-    arguments.AddArgument(new List<string> { "logout" }, "Logout", "Delete your Spotify session.");
+    arguments.AddArgument(new List<string> { "help" }, "Show this message.");
+    arguments.AddArgument(new List<string> { "login" }, "Login with your Spotify account.");
+    arguments.AddArgument(new List<string> { "logout" }, "Delete your Spotify session.");
 
     return arguments;
   }
