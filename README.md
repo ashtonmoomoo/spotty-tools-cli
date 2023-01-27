@@ -24,3 +24,10 @@ To see a list of available commands, do `dotnet run help`.
 
 **Note:** At the moment, `spotty-tools-cli` will store your session in a file in `~/.spotty/.session` so that you won't need to log in every time you use the application.
 Later I will add an optional flag to disable this behaviour (and let the user manually authorize each time), but at the moment, you can either delete the session folder/file manually, or do `dotnet run logout` which does the same thing.
+
+## Features
+- [x] Authorization Code flow with state and refresh tokens
+- [ ] Export library to CSV
+- [ ] Export a playlist to CSV by name
+- [ ] Export a list of playlists by comma-separated names
+- [ ] View list of most recent _n_ playlists
