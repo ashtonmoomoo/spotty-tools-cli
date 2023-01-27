@@ -7,8 +7,7 @@ using Application.Common.Utilities.Web;
 using Application.Spotify.Responses;
 
 namespace Application.Spotify;
-
-public class ClientBase
+public abstract class ClientBase
 {
   protected bool _isLoggedIn = false;
 
