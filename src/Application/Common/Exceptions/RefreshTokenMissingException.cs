@@ -1,4 +1,4 @@
-public class RefreshTokenMissingException : Exception
+public class TokenRefreshException : Exception
 {
-  public RefreshTokenMissingException() : base() { }
+  public TokenRefreshException(string message) : base(message) { }
 }

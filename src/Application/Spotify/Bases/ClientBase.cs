@@ -1,3 +1,5 @@
+using Application.Common.Exceptions;
+
 using Application.Common.Utilities.Encoding;
 using Application.Common.Utilities.FileSystem;
 using Application.Common.Utilities.Server;
@@ -25,6 +27,11 @@ public abstract class ClientBase
   {
     this.httpClient = new HttpClient();
     this.httpClient.BaseAddress = new Uri(Application.Spotify.Constants.ACCOUNTS_BASE_URL);
+
+    string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
+    var encodedSecret = Base64.Encode(toEncode);
+    this.httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {encodedSecret}");
+
     this._state = System.Guid.NewGuid().ToString();
 
     PrepareSession();
@@ -38,8 +45,7 @@ public abstract class ClientBase
   protected void DoOAuthHandshake()
   {
     GetAuthToken();
-    ExchangeToken();
-    CommitSession();
+    GetToken("access");
   }
 
   protected void ClearSession()
@@ -50,6 +56,19 @@ public abstract class ClientBase
     {
       File.Delete(filePath);
     }
+    _isLoggedIn = false;
+  }
+
+  private void GetAuthToken()
+  {
+    HttpServer server = new HttpServer();
+    var (token, state) = server.StartAndListenOnce();
+    if (state != this._state)
+    {
+      throw new InvalidOAuthStateException();
+    }
+
+    this._authToken = token;
   }
 
   private void PrepareSession()
@@ -58,57 +77,47 @@ public abstract class ClientBase
     if (sessionExists)
     {
       this._isLoggedIn = true;
-      DoTokenRefresh();
+      GetToken("refresh");
+      return;
     }
+
+    this._isLoggedIn = false;
   }
 
-  private HttpRequestMessage ConstructRequest()
+  private void GetToken(string tokenType)
   {
-    var postBody = new Dictionary<string, string>() {
-        { "grant_type", "authorization_code" },
-        { "code", this._authToken },
-        { "redirect_uri", this._redirectUri },
-      };
+    HttpRequestMessage? request = tokenType == "access"
+      ? ConstructAccessRequest()
+      : tokenType == "refresh"
+      ? ConstructRefreshRequest()
+      : null;
 
-    string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
-    var encodedSecret = Base64.Encode(toEncode);
-
-    var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
-    request.Content = new FormUrlEncodedContent(postBody);
-    request.Headers.Add("Authorization", $"Basic {encodedSecret}");
-
-    return request;
-  }
-
-  private AccessToken ParseTokenResponse(HttpResponseMessage response)
-  {
-    Stream contentStream = response.Content.ReadAsStream();
-    StreamReader readStream = new StreamReader(contentStream, System.Text.Encoding.UTF8);
-    string content = readStream.ReadToEnd()!;
-
-    return System.Text.Json.JsonSerializer.Deserialize<AccessToken>(content)!;
-  }
-
-  private void ExchangeToken()
-  {
-    var request = ConstructRequest();
+    if (request == null)
+    {
+      throw new OAuthFlowException("Invalid token request");
+    }
 
     HttpResponseMessage response = this.httpClient.Send(request);
     response.EnsureSuccessStatusCode();
 
-    var tokenResponse = ParseTokenResponse(response);
+    var stream = response.Content.ReadAsStream();
+    var tokenResponse = System.Text.Json.JsonSerializer.Deserialize<AccessToken>(stream);
+    if (tokenResponse == null)
+    {
+      throw new OAuthFlowException("Failed to parse token response");
+    }
 
-    AdornTokenResponseWithExpiryTime(tokenResponse);
+    // Refresh token responses don't include the refresh token used,
+    // so we copy the old value before setting the new one.
+    this._accessTokenResponse = new AccessToken(
+      tokenResponse.Token,
+      tokenResponse.Type,
+      tokenResponse.ExpiresIn,
+      tokenResponse.RefreshToken ?? this._accessTokenResponse?.RefreshToken ?? String.Empty,
+      tokenResponse.Scope
+    );
 
-    this._accessTokenResponse = tokenResponse;
-  }
-
-  private void AdornTokenResponseWithExpiryTime(AccessToken tokenResponse)
-  {
-    var lifetime = (double)tokenResponse.expires_in;
-    var expiry = DateTime.UtcNow;
-    expiry.AddSeconds(lifetime);
-    tokenResponse.expires_at = expiry;
+    CommitSession();
   }
 
   private void CommitSession()
@@ -122,7 +131,7 @@ public abstract class ClientBase
   {
     string storageDir = Storage.GetStorageLocation();
     string? sessionJson = Read.ReadFile($"{storageDir}/.session");
-    if (sessionJson == null)
+    if (String.IsNullOrWhiteSpace(sessionJson))
     {
       return false;
     }
@@ -131,17 +140,33 @@ public abstract class ClientBase
     if (existingSession != null)
     {
       this._accessTokenResponse = existingSession;
+      return true;
     }
 
-    return true;
+    return false;
+  }
+
+  private HttpRequestMessage ConstructAccessRequest()
+  {
+    var postBody = new Dictionary<string, string>() {
+        { "grant_type", "authorization_code" },
+        { "code", this._authToken },
+        { "redirect_uri", this._redirectUri },
+      };
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
+    request.Content = new FormUrlEncodedContent(postBody);
+
+    return request;
   }
 
   private HttpRequestMessage ConstructRefreshRequest()
   {
-    var refreshToken = this._accessTokenResponse?.refresh_token;
-    if (refreshToken == null)
+    var refreshToken = this._accessTokenResponse?.RefreshToken;
+
+    if (String.IsNullOrWhiteSpace(refreshToken))
     {
-      throw new RefreshTokenMissingException();
+      throw new TokenRefreshException("Couldn't load refresh token");
     }
 
     var postBody = new Dictionary<string, string>() {
@@ -149,43 +174,9 @@ public abstract class ClientBase
         { "refresh_token", refreshToken },
       };
 
-    string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
-    var encodedSecret = Base64.Encode(toEncode);
-
     var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
     request.Content = new FormUrlEncodedContent(postBody);
-    request.Headers.Add("Authorization", $"Basic {encodedSecret}");
 
     return request;
-  }
-
-  private void DoTokenRefresh()
-  {
-    var request = ConstructRefreshRequest();
-
-    var response = this.httpClient.Send(request);
-    response.EnsureSuccessStatusCode();
-
-    var tokenResponse = ParseTokenResponse(response);
-
-    AdornTokenResponseWithExpiryTime(tokenResponse);
-
-    var refreshToken = this._accessTokenResponse?.refresh_token;
-    this._accessTokenResponse = tokenResponse;
-    this._accessTokenResponse.refresh_token = refreshToken;
-
-    CommitSession();
-  }
-
-  private void GetAuthToken()
-  {
-    HttpServer server = new HttpServer();
-    var (token, state) = server.StartAndListenOnce();
-    if (state != this._state)
-    {
-      throw new InvalidOAuthStateException();
-    }
-
-    this._authToken = token;
   }
 }
