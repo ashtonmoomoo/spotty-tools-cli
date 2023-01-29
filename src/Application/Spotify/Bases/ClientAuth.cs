@@ -83,7 +83,7 @@ public abstract class ClientAuth
     this._isLoggedIn = false;
   }
 
-  private void GetToken(string tokenType)
+  private async void GetToken(string tokenType)
   {
     HttpRequestMessage? request = tokenType == "access"
       ? ConstructAccessRequest()
@@ -96,11 +96,7 @@ public abstract class ClientAuth
       throw new OAuthFlowException("Invalid token request");
     }
 
-    HttpResponseMessage response = this.httpClient.Send(request);
-    response.EnsureSuccessStatusCode();
-
-    var stream = response.Content.ReadAsStream();
-    var tokenResponse = System.Text.Json.JsonSerializer.Deserialize<AccessToken>(stream);
+    var tokenResponse = await Http.SendRequestAndParseAs<AccessToken>(request, this.httpClient);
     if (tokenResponse == null)
     {
       throw new OAuthFlowException("Failed to parse token response");

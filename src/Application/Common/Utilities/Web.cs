@@ -25,3 +25,13 @@ class Browser
     }
   }
 }
+
+public class Http
+{
+  public static async Task<T?> SendRequestAndParseAs<T>(HttpRequestMessage request, HttpClient client)
+  {
+    var response = await client.SendAsync(request);
+    var stream = response.Content.ReadAsStream();
+    return await System.Text.Json.JsonSerializer.DeserializeAsync<T>(stream);
+  }
+}
