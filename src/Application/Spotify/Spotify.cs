@@ -4,7 +4,7 @@ using Application.Spotify.Interfaces;
 
 namespace Application.Spotify;
 
-public class Client : ClientBase, ISpotifyClient
+public class Client : ClientAuth, ISpotifyClient
 {
   public Client() : base() { }
 

@@ -9,7 +9,7 @@ using Application.Common.Utilities.Web;
 using Application.Spotify.Responses;
 
 namespace Application.Spotify;
-public abstract class ClientBase
+public abstract class ClientAuth
 {
   protected bool _isLoggedIn = false;
 
@@ -23,7 +23,7 @@ public abstract class ClientBase
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;
 
-  protected ClientBase()
+  protected ClientAuth()
   {
     this.httpClient = new HttpClient();
     this.httpClient.BaseAddress = new Uri(Application.Spotify.Constants.ACCOUNTS_BASE_URL);
