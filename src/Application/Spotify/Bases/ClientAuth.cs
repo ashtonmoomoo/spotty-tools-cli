@@ -102,15 +102,7 @@ public abstract class ClientAuth
       throw new OAuthFlowException("Failed to parse token response");
     }
 
-    // Refresh token responses don't include the refresh token used,
-    // so we copy the old value before setting the new one.
-    this._accessTokenResponse = new AccessToken(
-      tokenResponse.Token,
-      tokenResponse.Type,
-      tokenResponse.ExpiresIn,
-      tokenResponse.RefreshToken ?? this._accessTokenResponse?.RefreshToken ?? String.Empty,
-      tokenResponse.Scope
-    );
+    this._accessTokenResponse = tokenResponse with { RefreshToken = tokenResponse.RefreshToken ?? this._accessTokenResponse?.RefreshToken ?? String.Empty };
 
     CommitSession();
   }
