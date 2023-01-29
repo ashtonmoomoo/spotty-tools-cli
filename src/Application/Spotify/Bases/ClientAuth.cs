@@ -23,10 +23,9 @@ public abstract class ClientAuth
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;
 
-  protected ClientAuth()
+  protected ClientAuth(HttpClient client)
   {
-    this.httpClient = new HttpClient();
-    this.httpClient.BaseAddress = new Uri(Application.Spotify.Constants.ACCOUNTS_BASE_URL);
+    this.httpClient = client;
 
     string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
     var encodedSecret = Base64.Encode(toEncode);
@@ -154,7 +153,7 @@ public abstract class ClientAuth
         { "redirect_uri", this._redirectUri },
       };
 
-    var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
+    var request = new HttpRequestMessage(HttpMethod.Post, $"{Constants.ACCOUNTS_BASE_URL}/api/token");
     request.Content = new FormUrlEncodedContent(postBody);
 
     return request;
@@ -174,7 +173,7 @@ public abstract class ClientAuth
         { "refresh_token", refreshToken },
       };
 
-    var request = new HttpRequestMessage(HttpMethod.Post, "/api/token");
+    var request = new HttpRequestMessage(HttpMethod.Post, $"{Constants.ACCOUNTS_BASE_URL}/api/token");
     request.Content = new FormUrlEncodedContent(postBody);
 
     return request;

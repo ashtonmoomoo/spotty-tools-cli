@@ -6,7 +6,7 @@ using Application.Spotify;
 
 public class Program
 {
-  private static Client _client = new Client();
+  private static Client _client = new Client(new HttpClient());
   private static ProgramArguments _arguments = Initialisation.GetProgramArguments();
 
   static int Main(string[] args)

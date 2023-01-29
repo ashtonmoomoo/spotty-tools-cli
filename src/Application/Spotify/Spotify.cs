@@ -6,7 +6,7 @@ namespace Application.Spotify;
 
 public class Client : ClientAuth, ISpotifyClient
 {
-  public Client() : base() { }
+  public Client(HttpClient httpClient) : base(httpClient) { }
 
   public bool IsLoggedIn()
   {
