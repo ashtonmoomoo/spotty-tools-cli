@@ -13,7 +13,7 @@ public abstract class ClientAuth
 {
   protected bool _isLoggedIn = false;
 
-  private readonly HttpClient httpClient;
+  protected readonly HttpClient httpClient;
   private readonly string _clientId = Variables.RequireEnvVar("SPOTIFY_CLIENT_ID");
   private readonly string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
   private readonly string _redirectUri = Variables.RequireEnvVar("SPOTIFY_REDIRECT_URI");
@@ -23,13 +23,17 @@ public abstract class ClientAuth
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;
 
+  protected string? AccessToken
+  {
+    get
+    {
+      return this._accessTokenResponse?.Token;
+    }
+  }
+
   protected ClientAuth(HttpClient client)
   {
     this.httpClient = client;
-
-    string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
-    var encodedSecret = Base64.Encode(toEncode);
-    this.httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {encodedSecret}");
 
     this._state = System.Guid.NewGuid().ToString();
 
@@ -41,10 +45,10 @@ public abstract class ClientAuth
     Browser.Open($"{Constants.ACCOUNTS_BASE_URL}/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
   }
 
-  protected void DoOAuthHandshake()
+  protected async Task DoOAuthHandshake()
   {
     GetAuthToken();
-    GetToken("access");
+    await GetToken("access");
   }
 
   protected void ClearSession()
@@ -70,20 +74,20 @@ public abstract class ClientAuth
     this._authToken = token;
   }
 
-  private void PrepareSession()
+  private async void PrepareSession()
   {
     var sessionExists = LoadSessionIfExists();
     if (sessionExists)
     {
       this._isLoggedIn = true;
-      GetToken("refresh");
+      await GetToken("refresh");
       return;
     }
 
     this._isLoggedIn = false;
   }
 
-  private async void GetToken(string tokenType)
+  private async Task GetToken(string tokenType)
   {
     HttpRequestMessage? request = tokenType == "access"
       ? ConstructAccessRequest()
@@ -95,6 +99,10 @@ public abstract class ClientAuth
     {
       throw new OAuthFlowException("Invalid token request");
     }
+
+    string toEncode = String.Join(":", new List<string> { this._clientId, this._clientSecret });
+    var encodedSecret = Base64.Encode(toEncode);
+    request.Headers.Add("Authorization", $"Basic {encodedSecret}");
 
     var tokenResponse = await Http.SendRequestAndParseAs<AccessToken>(request, this.httpClient);
     if (tokenResponse == null)
@@ -114,7 +122,7 @@ public abstract class ClientAuth
     Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
   }
 
-  private bool LoadSessionIfExists()
+  protected bool LoadSessionIfExists()
   {
     string storageDir = Storage.GetStorageLocation();
     string? sessionJson = Read.ReadFile($"{storageDir}/.session");

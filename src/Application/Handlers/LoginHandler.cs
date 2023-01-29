@@ -4,11 +4,11 @@ namespace Application.Handlers;
 
 public class LoginHandler
 {
-  public static int Dispatch(Application.Spotify.Client client)
+  public static async Task<int> Dispatch(Application.Spotify.Client client)
   {
     if (!client.IsLoggedIn())
     {
-      client.Login();
+      await client.Login();
       return 0;
     }
 

@@ -13,11 +13,24 @@ public class Client : ClientAuth, ISpotifyClient
     return _isLoggedIn;
   }
 
-  public void Login()
+  public async Task Login()
   {
-    PromptUser();
-    DoOAuthHandshake();
-    Info.LoginSuccess();
+    if (IsLoggedIn())
+    {
+      LoadLastSession();
+    }
+    else
+    {
+      PromptUser();
+      await DoOAuthHandshake();
+      Info.LoginSuccess();
+    }
+  }
+
+  public void LoadLastSession()
+  {
+    var loggedIn = LoadSessionIfExists();
+    this._isLoggedIn = loggedIn;
   }
 
   public void Logout()

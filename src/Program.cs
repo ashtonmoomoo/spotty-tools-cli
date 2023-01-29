@@ -1,4 +1,4 @@
-﻿using Application.CLI.Messages;
+using Application.CLI.Messages;
 using Application.CLI.Arguments;
 using Application.Configuration;
 using Application.Handlers;
@@ -9,9 +9,9 @@ public class Program
   private static Client _client = new Client(new HttpClient());
   private static ProgramArguments _arguments = Initialisation.GetProgramArguments();
 
-  static int Main(string[] args)
+  static async Task<int> Main(string[] args)
   {
-    Initialisation.StartUp();
+    Initialisation.StartUp(_client);
 
     if (args.Length == 0)
     {
@@ -20,10 +20,11 @@ public class Program
       return 1;
     }
 
-    return Dispatch(args);
+    await Dispatch(args);
+    return 0;
   }
 
-  private static int Dispatch(string[] args)
+  private static async Task<int> Dispatch(string[] args)
   {
     ArgumentParser argParser = new ArgumentParser(args);
     string thisArg = argParser.NextArg();
@@ -37,7 +38,7 @@ public class Program
         }
       case "login":
         {
-          return LoginHandler.Dispatch(_client);
+          return await LoginHandler.Dispatch(_client);
         }
       case "logout":
         {

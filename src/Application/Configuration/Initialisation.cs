@@ -24,8 +24,9 @@ public class Initialisation
     return arguments;
   }
 
-  public static void StartUp()
+  public static void StartUp(Application.Spotify.Client client)
   {
     CreateStorageLocationIfRequired();
+    client.LoadLastSession();
   }
 }
