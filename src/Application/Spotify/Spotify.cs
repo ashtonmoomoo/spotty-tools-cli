@@ -3,6 +3,7 @@ using Application.CLI.Messages;
 using Application.Spotify.Interfaces;
 using Application.Spotify.Responses;
 using Application.Spotify.Exceptions;
+using Application.Spotify.Exporters;
 
 using Application.Common.Utilities.Web;
 
@@ -42,10 +43,11 @@ public class Client : ClientAuth, ISpotifyClient
     ClearSession();
   }
 
-  public async Task ExportPlaylist(string playlistName)
+  public async Task ExportPlaylist(string playlistName, string path)
   {
     var playlistId = await FindPlaylistIdByName(playlistName);
     var tracks = await GetPlaylistTracks(playlistId);
+    CsvExporter.WriteTracksToCsv(tracks, path);
   }
 
   private async Task<string> FindPlaylistIdByName(string playlistName)

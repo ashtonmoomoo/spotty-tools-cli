@@ -13,7 +13,7 @@ public class ExportHandler
       case "playlist":
         {
           var playlistName = argParser.NextArg();
-          await client.ExportPlaylist(playlistName);
+          await client.ExportPlaylist(playlistName, argParser.NextArg());
           return 0;
         }
     }
