@@ -12,13 +12,13 @@ namespace Application.Spotify;
 public abstract class ClientAuth
 {
   protected bool _isLoggedIn = false;
-
   protected readonly HttpClient httpClient;
+
   private readonly string _clientId = Variables.RequireEnvVar("SPOTIFY_CLIENT_ID");
   private readonly string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
   private readonly string _redirectUri = Variables.RequireEnvVar("SPOTIFY_REDIRECT_URI");
   private readonly string _responseType = "code";
-  private readonly string _scopes = "user-read-private";
+  private readonly string _scopes = "user-library-read+playlist-read-private";
   private string _state;
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;

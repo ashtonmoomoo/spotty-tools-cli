@@ -1,4 +1,4 @@
-using Application.CLI.Messages;
+﻿using Application.CLI.Messages;
 using Application.CLI.Arguments;
 using Application.Configuration;
 using Application.Handlers;
@@ -43,6 +43,10 @@ public class Program
       case "logout":
         {
           return LogoutHandler.Dispatch(_client);
+        }
+      case "export":
+        {
+          return await ExportHandler.Dispatch(_client, argParser);
         }
       default:
         {
