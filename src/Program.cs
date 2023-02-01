@@ -20,8 +20,7 @@ public class Program
       return 1;
     }
 
-    await Dispatch(args);
-    return 0;
+    return await Dispatch(args);
   }
 
   private static async Task<int> Dispatch(string[] args)
