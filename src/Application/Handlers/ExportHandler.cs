@@ -6,6 +6,12 @@ public class ExportHandler
 {
   public static async Task<int> Dispatch(Application.Spotify.Client client, ArgumentParser argParser)
   {
+    if (!client.IsLoggedIn())
+    {
+      Application.CLI.Messages.Errors.NotLoggedIn();
+      return 1;
+    }
+
     var nextArg = argParser.NextArg();
 
     switch (nextArg)
