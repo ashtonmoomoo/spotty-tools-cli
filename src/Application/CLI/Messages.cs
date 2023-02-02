@@ -4,7 +4,7 @@ namespace Application.CLI.Messages;
 
 public static class Help
 {
-  public static void Header()
+  private static void Header()
   {
     Console.WriteLine();
     Console.WriteLine("spotty-tools-cli");
@@ -14,12 +14,22 @@ public static class Help
     Console.WriteLine("* Description *");
   }
 
-  public static void FormatArgument(Argument arg)
+  private static void FormatCommandHelp(Application.Commands.Command command)
   {
-    Console.Write(arg.aliases[0]);
-    Console.Write("\t\t");
-    Console.Write(arg.description);
+    Console.Write(command.Alias);
+    Console.Write('\t');
+    Console.Write('\t');
+    Console.Write(command.Description);
     Console.WriteLine();
+  }
+
+  public static void ShowHelp(Application.Commands.Command[] commands)
+  {
+    Header();
+    foreach (var command in commands)
+    {
+      FormatCommandHelp(command);
+    }
   }
 }
 

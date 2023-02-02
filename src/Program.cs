@@ -15,7 +15,6 @@ public class Program
     if (args.Length == 0)
     {
       Errors.NoArguments();
-      Initialisation.GetProgramArguments().ShowHelp();
       return 1;
     }
 
