@@ -6,14 +6,14 @@ public class LogoutHandler
 {
   public static int Dispatch(Application.Spotify.Client client)
   {
-    if (client.IsLoggedIn())
+    if (!client.IsLoggedIn())
     {
-      client.Logout();
-      Info.LogoutSuccess();
-      return 0;
+      Errors.NotLoggedIn();
+      return 1;
     }
 
-    Warnings.NotLoggedIn();
-    return 1;
+    client.Logout();
+    Info.LogoutSuccess();
+    return 0;
   }
 }

@@ -20,22 +20,12 @@ public class Client : ClientAuth, ISpotifyClient
 
   public async Task Login()
   {
-    if (IsLoggedIn())
-    {
-      LoadLastSession();
-    }
-    else
+    if (!IsLoggedIn())
     {
       PromptUser();
       await DoOAuthHandshake();
       Info.LoginSuccess();
     }
-  }
-
-  public void LoadLastSession()
-  {
-    var loggedIn = LoadSessionIfExists();
-    this._isLoggedIn = loggedIn;
   }
 
   public void Logout()

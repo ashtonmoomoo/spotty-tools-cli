@@ -57,11 +57,6 @@ public static class Warnings
   {
     Console.WriteLine("Already logged in!");
   }
-
-  public static void NotLoggedIn()
-  {
-    Console.WriteLine("Not logged in!");
-  }
 }
 
 public static class Errors
@@ -75,5 +70,10 @@ public static class Errors
   public static void UnsupportedArgument(string arg)
   {
     Console.WriteLine($"`{arg}` is not a supported argument.");
+  }
+
+  public static void NotLoggedIn()
+  {
+    Console.WriteLine("Not logged in!");
   }
 }
