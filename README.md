@@ -1,6 +1,8 @@
 # spotty-tools-cli
 `spotty-tools-cli` is a command line tool that offers a collection of utilities for your Spotify library.
 
+Plz be kind! I am using this application to learn C#.
+
 ## Getting started
 **Note:** I haven't yet looked into building/packaging the application, so it will need to be run in development mode 😅
 
