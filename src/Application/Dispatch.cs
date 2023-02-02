@@ -2,27 +2,28 @@ using Application.Configuration;
 using Application.Spotify;
 using Application.CLI.Arguments;
 using Application.CLI.Messages;
-using Application.Handlers;
+using Application.Commands;
 
 namespace Application.Dispatch;
 
 public class Dispatch
 {
-  private static Dictionary<string, Func<Client, ArgumentParser, Task<int>>> _dispatchers = new Dictionary<string, Func<Client, ArgumentParser, Task<int>>>() {
-    { "help", (Client _, ArgumentParser _) => {
-      Initialisation.GetProgramArguments().ShowHelp();
-      return Task.FromResult(0);
-    }},
-    { "login", (Client client, ArgumentParser _) => LoginHandler.Dispatch(client) },
-    { "logout",(Client client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client)) },
-    { "export", (Client client, ArgumentParser argParser) => ExportHandler.Dispatch(client, argParser) }
+  private static Command[] _commands =
+  {
+    new LoginCommand(),
+    new HelpCommand(),
+    new LogoutCommand(),
+    new ExportCommand()
   };
 
   public static Func<Client, ArgumentParser, Task<int>> GetDispatcher(string key)
   {
-    if (_dispatchers.ContainsKey(key))
+    foreach (var command in _commands)
     {
-      return _dispatchers[key];
+      if (command.Alias == key)
+      {
+        return command.GetDispatcher();
+      }
     }
 
     return (Client _, ArgumentParser _) =>
