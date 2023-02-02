@@ -1,5 +1,4 @@
 using Application.Common.Utilities.FileSystem;
-using Application.CLI.Arguments;
 
 namespace Application.Configuration;
 
@@ -14,9 +13,9 @@ public class Initialisation
     }
   }
 
-  public static void StartUp(Application.Spotify.Client client)
+  public static async Task StartUp(Application.Spotify.Client client)
   {
     CreateStorageLocationIfRequired();
-    client.LoadLastSession();
+    await client.PrepareSession();
   }
 }

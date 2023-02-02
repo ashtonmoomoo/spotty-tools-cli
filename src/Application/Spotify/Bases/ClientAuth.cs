@@ -22,6 +22,7 @@ public abstract class ClientAuth
   private string _state;
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;
+  private bool _refreshRequired = false;
 
   protected string? AccessToken
   {
@@ -36,8 +37,6 @@ public abstract class ClientAuth
     this.httpClient = client;
 
     this._state = System.Guid.NewGuid().ToString();
-
-    PrepareSession();
   }
 
   protected void PromptUser()
@@ -74,17 +73,14 @@ public abstract class ClientAuth
     this._authToken = token;
   }
 
-  private async void PrepareSession()
+  public async Task PrepareSession()
   {
-    var sessionExists = LoadSessionIfExists();
-    if (sessionExists)
-    {
-      this._isLoggedIn = true;
-      await GetToken("refresh");
-      return;
-    }
+    LoadSessionIfExists();
 
-    this._isLoggedIn = false;
+    if (this._refreshRequired)
+    {
+      await GetToken("refresh");
+    }
   }
 
   private async Task GetToken(string tokenType)
@@ -110,9 +106,27 @@ public abstract class ClientAuth
       throw new OAuthFlowException("Failed to parse token response");
     }
 
-    this._accessTokenResponse = tokenResponse with { RefreshToken = tokenResponse.RefreshToken ?? this._accessTokenResponse?.RefreshToken ?? String.Empty };
-
+    AdornAccessTokenAndSet(tokenResponse);
     CommitSession();
+  }
+
+  private void AdornAccessTokenAndSet(AccessToken tokenResponse)
+  {
+    var expiresAt = GetExpiryTime(tokenResponse);
+    this._accessTokenResponse = tokenResponse with
+    {
+      RefreshToken = tokenResponse.RefreshToken ?? this._accessTokenResponse?.RefreshToken ?? String.Empty,
+      ExpiresAt = expiresAt
+    };
+    this._isLoggedIn = true;
+    this._refreshRequired = false;
+  }
+
+  private DateTime GetExpiryTime(AccessToken tokenResponse)
+  {
+    var now = DateTime.Now;
+    var expiresAt = now.AddSeconds(tokenResponse.ExpiresIn);
+    return expiresAt;
   }
 
   private void CommitSession()
@@ -122,23 +136,35 @@ public abstract class ClientAuth
     Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
   }
 
-  protected bool LoadSessionIfExists()
+  protected void LoadSessionIfExists()
   {
     string storageDir = Storage.GetStorageLocation();
     string? sessionJson = Read.ReadFile($"{storageDir}/.session");
     if (String.IsNullOrWhiteSpace(sessionJson))
     {
-      return false;
+      this._isLoggedIn = false;
+      return;
     }
 
     AccessToken? existingSession = System.Text.Json.JsonSerializer.Deserialize<AccessToken>(sessionJson);
-    if (existingSession != null)
+    if (existingSession == null)
     {
-      this._accessTokenResponse = existingSession;
-      return true;
+      this._isLoggedIn = false;
+      return;
     }
 
-    return false;
+    if (DateTime.Now > existingSession.ExpiresAt)
+    {
+      this._isLoggedIn = false;
+      this._refreshRequired = true;
+      this._accessTokenResponse = existingSession;
+      return;
+    }
+
+    this._accessTokenResponse = existingSession;
+    this._isLoggedIn = true;
+    this._refreshRequired = true;
+    return;
   }
 
   private HttpRequestMessage ConstructAccessRequest()

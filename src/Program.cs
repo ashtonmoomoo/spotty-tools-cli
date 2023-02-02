@@ -10,7 +10,7 @@ public class Program
 
   static async Task<int> Main(string[] args)
   {
-    Initialisation.StartUp(_client);
+    await Initialisation.StartUp(_client);
 
     if (args.Length == 0)
     {
