@@ -1,4 +1,3 @@
-using Application.Configuration;
 using Application.Spotify;
 using Application.CLI.Arguments;
 
@@ -26,7 +25,7 @@ public class HelpCommand : Command
   {
     return (Client _, ArgumentParser _) =>
     {
-      Initialisation.GetProgramArguments().ShowHelp();
+      Application.CLI.Messages.Help.ShowHelp(Commands.AllowedCommands);
       return Task.FromResult(0);
     };
   }
