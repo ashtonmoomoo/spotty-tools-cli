@@ -7,6 +7,7 @@ public class Commands
     new LoginCommand(),
     new HelpCommand(),
     new LogoutCommand(),
-    new ExportCommand()
+    new ExportCommand(),
+    new AddCommand(),
   };
 }
