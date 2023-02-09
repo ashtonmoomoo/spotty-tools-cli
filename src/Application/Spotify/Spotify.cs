@@ -159,6 +159,12 @@ public class Client : ClientAuth, ISpotifyClient
     return await HandlePagination<TrackWithAddedAt>(firstPage);
   }
 
+  public async Task<User> GetCurrentUser()
+  {
+    string url = $"{Constants.API_BASE_URL}/me";
+    return await AuthedRequest<User>(HttpMethod.Get, url);
+  }
+
   private async Task<List<T>> HandlePagination<T>(string firstPageLink)
   {
     var results = new List<T>();
