@@ -96,24 +96,38 @@ public class Client : ClientAuth, ISpotifyClient
   public async Task AddAlbumsToPlaylist(string playlistName)
   {
     var albums = await GetAlbums();
-    var playlistId = await FindPlaylistIdByName(playlistName);
     var allTrackIds = GetTrackIdsFromAlbums(albums);
-
     var tracksCount = allTrackIds.Count();
-    if (tracksCount > Constants.Playlist.MAX_LENGTH)
+
+    var playlistIds = new List<string>();
+    var numberOfPlaylists = System.Math.Ceiling(1f * tracksCount / Constants.Playlist.MAX_LENGTH);
+    for (var i = 1; i <= numberOfPlaylists; i++)
     {
-      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. There will be songs missing!");
+      var id = await CreatePlaylist($"{playlistName} Part {i}");
+      playlistIds.Add(id);
     }
 
-    var trackIdBatches = allTrackIds.Take(Constants.Playlist.MAX_LENGTH).Chunk(Constants.Playlist.MAX_SONGS_TO_ADD);
-    var numberOfBatches = trackIdBatches.Count();
-
-    var progress = 0;
-    foreach (var batch in trackIdBatches)
+    if (tracksCount > Constants.Playlist.MAX_LENGTH)
     {
-      await AddSongsToPlaylist(batch.ToList(), playlistId);
-      progress++;
-      Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
+      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. Splitting into multiple playlists...");
+    }
+
+    var superBatches = allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
+    var playlistIndex = 0;
+    foreach (var superBatch in superBatches)
+    {
+      var playlistId = playlistIds[playlistIndex];
+      var numberOfBatches = superBatch.Count();
+
+      var progress = 0;
+      foreach (var batch in superBatch)
+      {
+        await AddSongsToPlaylist(batch.ToList(), playlistId);
+        progress++;
+        Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
+      }
+
+      playlistIndex++;
     }
   }
 
