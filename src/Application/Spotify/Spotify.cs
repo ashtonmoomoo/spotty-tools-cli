@@ -93,6 +93,61 @@ public class Client : ClientAuth, ISpotifyClient
     return await HandlePagination<PlaylistLite>(firstPage);
   }
 
+  public async Task AddAlbumsToPlaylist(string playlistName)
+  {
+    var albums = await GetAlbums();
+    var playlistId = await FindPlaylistIdByName(playlistName);
+    var allTrackIds = GetTrackIdsFromAlbums(albums);
+
+    var tracksCount = allTrackIds.Count();
+    if (tracksCount > Constants.Playlist.MAX_LENGTH)
+    {
+      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. There will be songs missing!");
+    }
+
+    var trackIdBatches = allTrackIds.Take(Constants.Playlist.MAX_LENGTH).Chunk(Constants.Playlist.MAX_SONGS_TO_ADD);
+    var numberOfBatches = trackIdBatches.Count();
+
+    var progress = 0;
+    foreach (var batch in trackIdBatches)
+    {
+      await AddSongsToPlaylist(batch.ToList(), playlistId);
+      progress++;
+      Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
+    }
+  }
+
+  private async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
+  {
+    var url = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?uris={String.Join(",", songIdsToAdd)}";
+    await AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
+  }
+
+  private List<string> GetTrackIdsFromAlbums(List<AlbumWithAddedAt> albums)
+  {
+    var allTrackIds = new List<string>();
+
+    // Assume that album has less than 50 tracks and 
+    // doesn't actually require pagination
+    foreach (var album in albums)
+    {
+      allTrackIds.AddRange(album.Album.TracksPage.Items.Select(item => item.URI));
+    }
+
+    return allTrackIds;
+  }
+
+  public async Task<List<AlbumWithAddedAt>> GetAlbums()
+  {
+    var options = new PageOptions();
+    options.Limit = 50;
+    options.Offset = 0;
+
+    string firstPage = $"{Constants.API_BASE_URL}/me/albums?{options.QueryString()}";
+
+    return await HandlePagination<AlbumWithAddedAt>(firstPage);
+  }
+
   public async Task<List<TrackWithAddedAt>> GetLibrary()
   {
     var options = new PageOptions();

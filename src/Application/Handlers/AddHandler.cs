@@ -23,7 +23,7 @@ public class AddHandler
       return 1;
     }
 
-    // Call client here
+    await client.AddAlbumsToPlaylist(destination);
 
     return 0;
   }
