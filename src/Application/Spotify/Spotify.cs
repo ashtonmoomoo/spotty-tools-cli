@@ -165,6 +165,15 @@ public class Client : ClientAuth, ISpotifyClient
     return await AuthedRequest<User>(HttpMethod.Get, url);
   }
 
+  public async Task<string> CreatePlaylist(string playlistName)
+  {
+    var currentUserId = (await GetCurrentUser()).Id;
+    string url = $"{Constants.API_BASE_URL}/users/{currentUserId}/playlists";
+    string body = $"{{\"name\":\"{playlistName}\"}}";
+
+    return (await AuthedRequest<PlaylistLite>(HttpMethod.Post, url, body)).Id;
+  }
+
   private async Task<List<T>> HandlePagination<T>(string firstPageLink)
   {
     var results = new List<T>();
