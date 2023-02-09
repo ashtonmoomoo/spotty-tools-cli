@@ -23,3 +23,7 @@ public record class Playlist(
   [property: JsonPropertyName("tracks")] Pagination<TrackWithAddedAt> Tracks,
   [property: JsonPropertyName("uri")] string Uri
 );
+
+public record class PlaylistSnapshot(
+  [property: JsonPropertyName("snapshot_id")] string SnapshotId
+);

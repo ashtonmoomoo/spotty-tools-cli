@@ -35,7 +35,8 @@ Later I will add an optional flag to disable this behaviour (and let the user ma
 
 ## Features
 - [x] Authorization Code flow with state and refresh tokens
-- [ ] Export library to CSV
 - [x] Export a playlist to CSV by name
+- [x] Add all songs from liked albums to delegate playlist
+- [ ] Export library to CSV
 - [ ] Export a list of playlists by comma-separated names
 - [ ] View list of most recent _n_ playlists

@@ -18,7 +18,7 @@ public abstract class ClientAuth
   private readonly string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
   private readonly string _redirectUri = Variables.RequireEnvVar("SPOTIFY_REDIRECT_URI");
   private readonly string _responseType = "code";
-  private readonly string _scopes = "user-library-read+playlist-read-private";
+  private readonly string _scopes = "user-library-read+playlist-read-private+playlist-modify-public";
   private string _state;
   private string _authToken = String.Empty;
   private AccessToken? _accessTokenResponse;

@@ -93,6 +93,75 @@ public class Client : ClientAuth, ISpotifyClient
     return await HandlePagination<PlaylistLite>(firstPage);
   }
 
+  public async Task AddAlbumsToPlaylist(string playlistName)
+  {
+    var albums = await GetAlbums();
+    var allTrackIds = GetTrackIdsFromAlbums(albums);
+    var tracksCount = allTrackIds.Count();
+
+    var playlistIds = new List<string>();
+    var numberOfPlaylists = System.Math.Ceiling(1f * tracksCount / Constants.Playlist.MAX_LENGTH);
+    for (var i = 1; i <= numberOfPlaylists; i++)
+    {
+      var id = await CreatePlaylist($"{playlistName} Part {i}");
+      playlistIds.Add(id);
+    }
+
+    if (tracksCount > Constants.Playlist.MAX_LENGTH)
+    {
+      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. Splitting into multiple playlists...");
+    }
+
+    var superBatches = allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
+    var playlistIndex = 0;
+    foreach (var superBatch in superBatches)
+    {
+      var playlistId = playlistIds[playlistIndex];
+      var numberOfBatches = superBatch.Count();
+
+      var progress = 0;
+      foreach (var batch in superBatch)
+      {
+        await AddSongsToPlaylist(batch.ToList(), playlistId);
+        progress++;
+        Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
+      }
+
+      playlistIndex++;
+    }
+  }
+
+  private async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
+  {
+    var url = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?uris={String.Join(",", songIdsToAdd)}";
+    await AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
+  }
+
+  private List<string> GetTrackIdsFromAlbums(List<AlbumWithAddedAt> albums)
+  {
+    var allTrackIds = new List<string>();
+
+    // Assume that album has less than 50 tracks and 
+    // doesn't actually require pagination
+    foreach (var album in albums)
+    {
+      allTrackIds.AddRange(album.Album.TracksPage.Items.Select(item => item.URI));
+    }
+
+    return allTrackIds;
+  }
+
+  public async Task<List<AlbumWithAddedAt>> GetAlbums()
+  {
+    var options = new PageOptions();
+    options.Limit = 50;
+    options.Offset = 0;
+
+    string firstPage = $"{Constants.API_BASE_URL}/me/albums?{options.QueryString()}";
+
+    return await HandlePagination<AlbumWithAddedAt>(firstPage);
+  }
+
   public async Task<List<TrackWithAddedAt>> GetLibrary()
   {
     var options = new PageOptions();
@@ -102,6 +171,21 @@ public class Client : ClientAuth, ISpotifyClient
     string firstPage = $"{Constants.API_BASE_URL}/me/tracks?{options.QueryString()}";
 
     return await HandlePagination<TrackWithAddedAt>(firstPage);
+  }
+
+  public async Task<User> GetCurrentUser()
+  {
+    string url = $"{Constants.API_BASE_URL}/me";
+    return await AuthedRequest<User>(HttpMethod.Get, url);
+  }
+
+  public async Task<string> CreatePlaylist(string playlistName)
+  {
+    var currentUserId = (await GetCurrentUser()).Id;
+    string url = $"{Constants.API_BASE_URL}/users/{currentUserId}/playlists";
+    string body = $"{{\"name\":\"{playlistName}\"}}";
+
+    return (await AuthedRequest<PlaylistLite>(HttpMethod.Post, url, body)).Id;
   }
 
   private async Task<List<T>> HandlePagination<T>(string firstPageLink)
@@ -122,7 +206,17 @@ public class Client : ClientAuth, ISpotifyClient
 
   private async Task<T> AuthedRequest<T>(HttpMethod method, string link)
   {
+    return await AuthedRequest<T>(method, link, null);
+  }
+
+  private async Task<T> AuthedRequest<T>(HttpMethod method, string link, string? body)
+  {
     var request = new HttpRequestMessage(method, link);
+    if (body != null)
+    {
+      request.Content = new StringContent(body);
+    }
+
     request.Headers.Add("Authorization", $"Bearer {this.AccessToken}");
     var response = await Http.SendRequestAndParseAs<T>(request, this.httpClient);
     if (response == null)

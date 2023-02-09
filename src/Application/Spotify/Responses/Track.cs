@@ -8,7 +8,7 @@ public record class TracksLite(
 );
 
 public record class Track(
-  [property: JsonPropertyName("album")] Album Album,
+  [property: JsonPropertyName("album")] AlbumLite Album,
   [property: JsonPropertyName("artists")] Artist[] Artists,
   [property: JsonPropertyName("href")] string Href,
   [property: JsonPropertyName("id")] string Id,
