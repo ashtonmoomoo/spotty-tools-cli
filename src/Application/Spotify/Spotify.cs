@@ -183,7 +183,17 @@ public class Client : ClientAuth, ISpotifyClient
 
   private async Task<T> AuthedRequest<T>(HttpMethod method, string link)
   {
+    return await AuthedRequest<T>(method, link, null);
+  }
+
+  private async Task<T> AuthedRequest<T>(HttpMethod method, string link, string? body)
+  {
     var request = new HttpRequestMessage(method, link);
+    if (body != null)
+    {
+      request.Content = new StringContent(body);
+    }
+
     request.Headers.Add("Authorization", $"Bearer {this.AccessToken}");
     var response = await Http.SendRequestAndParseAs<T>(request, this.httpClient);
     if (response == null)
