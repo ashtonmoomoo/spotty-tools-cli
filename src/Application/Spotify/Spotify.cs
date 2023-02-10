@@ -1,8 +1,6 @@
 using Application.Interfaces;
 using Application.Spotify.Responses;
 
-using Application.Common.Utilities.Web;
-
 namespace Application.Spotify;
 
 public class SpotifyClient : IClient
@@ -49,7 +47,7 @@ public class SpotifyClient : IClient
       return result;
     }
 
-    var restOfTracks = await HandlePagination<TrackWithAddedAt>(tracksPage.Next);
+    var restOfTracks = await Pagination.HandlePagination<TrackWithAddedAt>(tracksPage.Next, auth);
     result.AddRange(restOfTracks);
 
     return result;
@@ -59,7 +57,7 @@ public class SpotifyClient : IClient
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/playlists?{options.QueryString()}";
-    return await HandlePagination<PlaylistLite>(firstPage);
+    return await Pagination.HandlePagination<PlaylistLite>(firstPage, auth);
   }
 
   public async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
@@ -72,14 +70,14 @@ public class SpotifyClient : IClient
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/albums?{options.QueryString()}";
-    return await HandlePagination<AlbumWithAddedAt>(firstPage);
+    return await Pagination.HandlePagination<AlbumWithAddedAt>(firstPage, auth);
   }
 
   public async Task<List<TrackWithAddedAt>> GetLibrary()
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/tracks?{options.QueryString()}";
-    return await HandlePagination<TrackWithAddedAt>(firstPage);
+    return await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
   }
 
   public async Task<User> GetCurrentUser()
@@ -95,21 +93,5 @@ public class SpotifyClient : IClient
     string body = $"{{\"name\":\"{playlistName}\"}}";
 
     return (await auth.AuthedRequest<PlaylistLite>(HttpMethod.Post, url, body)).Id;
-  }
-
-  private async Task<List<T>> HandlePagination<T>(string firstPageLink)
-  {
-    var results = new List<T>();
-    string? next = firstPageLink;
-
-    do
-    {
-      var page = await auth.AuthedRequest<Pagination<T>>(HttpMethod.Get, next);
-      results.AddRange(page.Items);
-      next = page.Next;
-    }
-    while (next != null);
-
-    return results;
   }
 }
