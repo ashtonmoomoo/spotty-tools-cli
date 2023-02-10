@@ -2,8 +2,6 @@ using Application.CLI.Messages;
 
 using Application.Spotify.Interfaces;
 using Application.Spotify.Responses;
-using Application.Spotify.Exceptions;
-using Application.Spotify.Exporters;
 
 using Application.Common.Utilities.Web;
 
@@ -31,34 +29,6 @@ public class Client : ClientAuth, ISpotifyClient
   public void Logout()
   {
     ClearSession();
-  }
-
-  public async Task ExportPlaylist(string playlistName, string path)
-  {
-    var playlistId = await FindPlaylistIdByName(playlistName);
-    var tracks = await GetPlaylistTracks(playlistId);
-    CsvExporter.WriteTracksToCsv(tracks, path);
-  }
-
-  private async Task<string> FindPlaylistIdByName(string playlistName)
-  {
-    var playlists = await GetPlaylists();
-    string? thePlayListId = null;
-    foreach (PlaylistLite p in playlists)
-    {
-      if (p.Name == playlistName)
-      {
-        thePlayListId = p.Id;
-        break;
-      }
-    }
-
-    if (thePlayListId == null)
-    {
-      throw new PlaylistNotFoundException($"Playlist with name `{playlistName}` not found");
-    }
-
-    return thePlayListId;
   }
 
   public async Task<List<TrackWithAddedAt>> GetPlaylistTracks(string playlistId)
