@@ -7,11 +7,12 @@ using Application.Spotify;
 
 public class Program
 {
-  private static IClient _client = new SpotifyClient(new HttpClient());
-
   static async Task<int> Main(string[] args)
   {
-    await Initialisation.StartUp(_client);
+    var httpClient = new HttpClient();
+    var spotifyClient = new SpotifyClient(new SpotifyAuth(httpClient));
+
+    await Initialisation.StartUp(spotifyClient);
 
     if (args.Length == 0)
     {
@@ -22,6 +23,6 @@ public class Program
     ArgumentParser argParser = new ArgumentParser(args);
     string firstArg = argParser.NextArg();
 
-    return await Dispatch.GetDispatcher(firstArg)(_client, argParser);
+    return await Dispatch.GetDispatcher(firstArg)(spotifyClient, argParser);
   }
 }

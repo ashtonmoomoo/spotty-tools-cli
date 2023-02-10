@@ -1,5 +1,3 @@
-using Application.CLI.Messages;
-
 using Application.Interfaces;
 using Application.Spotify.Responses;
 
@@ -7,28 +5,33 @@ using Application.Common.Utilities.Web;
 
 namespace Application.Spotify;
 
-public class SpotifyClient : ClientAuth, IClient
+public class SpotifyClient : IClient
 {
-  public SpotifyClient(HttpClient httpClient) : base(httpClient) { }
+  private IClientAuth auth;
+
+  public SpotifyClient(IClientAuth auth)
+  {
+    this.auth = auth;
+  }
 
   public bool IsLoggedIn()
   {
-    return _isLoggedIn;
+    return auth.IsLoggedIn();
   }
 
   public async Task Login()
   {
-    if (!IsLoggedIn())
-    {
-      PromptUser();
-      await DoOAuthHandshake();
-      Info.LoginSuccess();
-    }
+    await auth.Login();
   }
 
   public void Logout()
   {
-    ClearSession();
+    auth.Logout();
+  }
+
+  public async Task PrepareSession()
+  {
+    await auth.PrepareSession();
   }
 
   public async Task<List<TrackWithAddedAt>> GetPlaylistTracks(string playlistId)
@@ -37,7 +40,7 @@ public class SpotifyClient : ClientAuth, IClient
 
     var result = new List<TrackWithAddedAt>();
 
-    var playlist = await AuthedRequest<Playlist>(HttpMethod.Get, link);
+    var playlist = await auth.AuthedRequest<Playlist>(HttpMethod.Get, link);
     var tracksPage = playlist.Tracks;
 
     result.AddRange(tracksPage.Items);
@@ -62,7 +65,7 @@ public class SpotifyClient : ClientAuth, IClient
   public async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
   {
     var url = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?uris={String.Join(",", songIdsToAdd)}";
-    await AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
+    await auth.AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
   }
 
   public async Task<List<AlbumWithAddedAt>> GetAlbums()
@@ -82,7 +85,7 @@ public class SpotifyClient : ClientAuth, IClient
   public async Task<User> GetCurrentUser()
   {
     string url = $"{Constants.API_BASE_URL}/me";
-    return await AuthedRequest<User>(HttpMethod.Get, url);
+    return await auth.AuthedRequest<User>(HttpMethod.Get, url);
   }
 
   public async Task<string> CreatePlaylist(string playlistName)
@@ -91,7 +94,7 @@ public class SpotifyClient : ClientAuth, IClient
     string url = $"{Constants.API_BASE_URL}/users/{currentUserId}/playlists";
     string body = $"{{\"name\":\"{playlistName}\"}}";
 
-    return (await AuthedRequest<PlaylistLite>(HttpMethod.Post, url, body)).Id;
+    return (await auth.AuthedRequest<PlaylistLite>(HttpMethod.Post, url, body)).Id;
   }
 
   private async Task<List<T>> HandlePagination<T>(string firstPageLink)
@@ -101,35 +104,12 @@ public class SpotifyClient : ClientAuth, IClient
 
     do
     {
-      var page = await AuthedRequest<Pagination<T>>(HttpMethod.Get, next);
+      var page = await auth.AuthedRequest<Pagination<T>>(HttpMethod.Get, next);
       results.AddRange(page.Items);
       next = page.Next;
     }
     while (next != null);
 
     return results;
-  }
-
-  private async Task<T> AuthedRequest<T>(HttpMethod method, string link)
-  {
-    return await AuthedRequest<T>(method, link, null);
-  }
-
-  private async Task<T> AuthedRequest<T>(HttpMethod method, string link, string? body)
-  {
-    var request = new HttpRequestMessage(method, link);
-    if (body != null)
-    {
-      request.Content = new StringContent(body);
-    }
-
-    request.Headers.Add("Authorization", $"Bearer {this.AccessToken}");
-    var response = await Http.SendRequestAndParseAs<T>(request, this.httpClient);
-    if (response == null)
-    {
-      throw new Exception();
-    }
-
-    return response;
   }
 }
