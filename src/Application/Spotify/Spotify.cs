@@ -93,62 +93,10 @@ public class Client : ClientAuth, ISpotifyClient
     return await HandlePagination<PlaylistLite>(firstPage);
   }
 
-  public async Task AddAlbumsToPlaylist(string playlistName)
-  {
-    var albums = await GetAlbums();
-    var allTrackIds = GetTrackIdsFromAlbums(albums);
-    var tracksCount = allTrackIds.Count();
-
-    var playlistIds = new List<string>();
-    var numberOfPlaylists = System.Math.Ceiling(1f * tracksCount / Constants.Playlist.MAX_LENGTH);
-    for (var i = 1; i <= numberOfPlaylists; i++)
-    {
-      var id = await CreatePlaylist($"{playlistName} Part {i}");
-      playlistIds.Add(id);
-    }
-
-    if (tracksCount > Constants.Playlist.MAX_LENGTH)
-    {
-      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. Splitting into multiple playlists...");
-    }
-
-    var superBatches = allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
-    var playlistIndex = 0;
-    foreach (var superBatch in superBatches)
-    {
-      var playlistId = playlistIds[playlistIndex];
-      var numberOfBatches = superBatch.Count();
-
-      var progress = 0;
-      foreach (var batch in superBatch)
-      {
-        await AddSongsToPlaylist(batch.ToList(), playlistId);
-        progress++;
-        Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
-      }
-
-      playlistIndex++;
-    }
-  }
-
-  private async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
+  public async Task AddSongsToPlaylist(List<string> songIdsToAdd, string playlistId)
   {
     var url = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?uris={String.Join(",", songIdsToAdd)}";
     await AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
-  }
-
-  private List<string> GetTrackIdsFromAlbums(List<AlbumWithAddedAt> albums)
-  {
-    var allTrackIds = new List<string>();
-
-    // Assume that album has less than 50 tracks and 
-    // doesn't actually require pagination
-    foreach (var album in albums)
-    {
-      allTrackIds.AddRange(album.Album.TracksPage.Items.Select(item => item.URI));
-    }
-
-    return allTrackIds;
   }
 
   public async Task<List<AlbumWithAddedAt>> GetAlbums()
