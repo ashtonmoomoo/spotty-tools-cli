@@ -1,5 +1,6 @@
 using Application.Spotify.Responses;
 using Application.Spotify;
+using Application.Interfaces;
 
 namespace Application.Handlers;
 
@@ -10,7 +11,7 @@ public class AddHandler
     public static readonly string[] RESOURCES = { "albums" };
   }
 
-  public static async Task<int> Dispatch(Application.Spotify.Client client, Application.CLI.Arguments.ArgumentParser argParser)
+  public static async Task<int> Dispatch(IClient client, Application.CLI.Arguments.ArgumentParser argParser)
   {
     var resource = argParser.NextArg();
     if (String.IsNullOrWhiteSpace(resource) || !AllowedResources.RESOURCES.Contains(resource))
@@ -31,7 +32,7 @@ public class AddHandler
     return 0;
   }
 
-  public static async Task AddAlbumsToPlaylist(string playlistName, Application.Spotify.Client client)
+  public static async Task AddAlbumsToPlaylist(string playlistName, IClient client)
   {
     var albums = await client.GetAlbums();
     var allTrackIds = GetTrackIdsFromAlbums(albums);

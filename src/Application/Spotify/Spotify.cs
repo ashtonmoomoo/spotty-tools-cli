@@ -1,15 +1,15 @@
 using Application.CLI.Messages;
 
-using Application.Spotify.Interfaces;
+using Application.Interfaces;
 using Application.Spotify.Responses;
 
 using Application.Common.Utilities.Web;
 
 namespace Application.Spotify;
 
-public class Client : ClientAuth, ISpotifyClient
+public class SpotifyClient : ClientAuth, IClient
 {
-  public Client(HttpClient httpClient) : base(httpClient) { }
+  public SpotifyClient(HttpClient httpClient) : base(httpClient) { }
 
   public bool IsLoggedIn()
   {

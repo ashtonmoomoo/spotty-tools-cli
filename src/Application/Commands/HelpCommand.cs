@@ -1,4 +1,4 @@
-using Application.Spotify;
+using Application.Interfaces;
 using Application.CLI.Arguments;
 
 namespace Application.Commands;
@@ -21,9 +21,9 @@ public class HelpCommand : Command
     }
   }
 
-  public override Func<Client, ArgumentParser, Task<int>> GetDispatcher()
+  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
-    return (Client _, ArgumentParser _) =>
+    return (IClient _, ArgumentParser _) =>
     {
       Application.CLI.Messages.Help.ShowHelp(Commands.AllowedCommands);
       return Task.FromResult(0);

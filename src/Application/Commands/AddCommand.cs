@@ -1,5 +1,5 @@
 using Application.Handlers;
-using Application.Spotify;
+using Application.Interfaces;
 using Application.CLI.Arguments;
 
 namespace Application.Commands;
@@ -22,8 +22,8 @@ public class AddCommand : Command
     }
   }
 
-  public override Func<Client, ArgumentParser, Task<int>> GetDispatcher()
+  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
-    return (Client client, ArgumentParser argParser) => AddHandler.Dispatch(client, argParser);
+    return (IClient client, ArgumentParser argParser) => AddHandler.Dispatch(client, argParser);
   }
 }

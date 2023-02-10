@@ -1,4 +1,5 @@
-﻿using Application.CLI.Messages;
+﻿using Application.Interfaces;
+using Application.CLI.Messages;
 using Application.CLI.Arguments;
 using Application.Configuration;
 using Application.Dispatch;
@@ -6,7 +7,7 @@ using Application.Spotify;
 
 public class Program
 {
-  private static Client _client = new Client(new HttpClient());
+  private static IClient _client = new SpotifyClient(new HttpClient());
 
   static async Task<int> Main(string[] args)
   {

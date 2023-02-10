@@ -1,5 +1,5 @@
 using Application.CLI.Arguments;
-using Application.Spotify;
+using Application.Interfaces;
 
 namespace Application.Commands;
 
@@ -7,6 +7,5 @@ public abstract class Command
 {
   public abstract string Alias { get; }
   public abstract string Description { get; }
-
-  public abstract Func<Client, ArgumentParser, Task<int>> GetDispatcher();
+  public abstract Func<IClient, ArgumentParser, Task<int>> GetDispatcher();
 };

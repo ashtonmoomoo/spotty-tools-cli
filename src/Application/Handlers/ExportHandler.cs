@@ -1,13 +1,13 @@
 using Application.CLI.Arguments;
-
 using Application.Spotify.Responses;
 using Application.Spotify.Exceptions;
+using Application.Interfaces;
 
 namespace Application.Handlers;
 
 public class ExportHandler
 {
-  public static async Task<int> Dispatch(Application.Spotify.Client client, ArgumentParser argParser)
+  public static async Task<int> Dispatch(IClient client, ArgumentParser argParser)
   {
     if (!client.IsLoggedIn())
     {
@@ -30,14 +30,14 @@ public class ExportHandler
     return 0;
   }
 
-  private static async Task ExportPlaylist(string playlistName, string path, Application.Spotify.Client client)
+  private static async Task ExportPlaylist(string playlistName, string path, IClient client)
   {
     var playlistId = await FindPlaylistIdByName(playlistName, client);
     var tracks = await client.GetPlaylistTracks(playlistId);
     Application.Spotify.Exporters.CsvExporter.WriteTracksToCsv(tracks, path);
   }
 
-  private static async Task<string> FindPlaylistIdByName(string playlistName, Application.Spotify.Client client)
+  private static async Task<string> FindPlaylistIdByName(string playlistName, IClient client)
   {
     var playlists = await client.GetPlaylists();
     string? thePlayListId = null;

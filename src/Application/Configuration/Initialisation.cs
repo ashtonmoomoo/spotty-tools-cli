@@ -13,7 +13,7 @@ public class Initialisation
     }
   }
 
-  public static async Task StartUp(Application.Spotify.Client client)
+  public static async Task StartUp(Application.Interfaces.IClient client)
   {
     CreateStorageLocationIfRequired();
     await client.PrepareSession();
