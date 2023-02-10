@@ -54,12 +54,8 @@ public class Client : ClientAuth, ISpotifyClient
 
   public async Task<List<PlaylistLite>> GetPlaylists()
   {
-    var options = new PageOptions();
-    options.Limit = 50;
-    options.Offset = 0;
-
+    var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/playlists?{options.QueryString()}";
-
     return await HandlePagination<PlaylistLite>(firstPage);
   }
 
@@ -71,23 +67,15 @@ public class Client : ClientAuth, ISpotifyClient
 
   public async Task<List<AlbumWithAddedAt>> GetAlbums()
   {
-    var options = new PageOptions();
-    options.Limit = 50;
-    options.Offset = 0;
-
+    var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/albums?{options.QueryString()}";
-
     return await HandlePagination<AlbumWithAddedAt>(firstPage);
   }
 
   public async Task<List<TrackWithAddedAt>> GetLibrary()
   {
-    var options = new PageOptions();
-    options.Limit = 50;
-    options.Offset = 0;
-
+    var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/tracks?{options.QueryString()}";
-
     return await HandlePagination<TrackWithAddedAt>(firstPage);
   }
 
