@@ -1,4 +1,4 @@
-using Application.Spotify;
+using Application.Interfaces;
 using Application.CLI.Arguments;
 using Application.CLI.Messages;
 
@@ -6,7 +6,7 @@ namespace Application.Dispatch;
 
 public class Dispatch
 {
-  public static Func<Client, ArgumentParser, Task<int>> GetDispatcher(string key)
+  public static Func<IClient, ArgumentParser, Task<int>> GetDispatcher(string key)
   {
     foreach (var command in Commands.Commands.AllowedCommands)
     {
@@ -16,7 +16,7 @@ public class Dispatch
       }
     }
 
-    return (Client _, ArgumentParser _) =>
+    return (IClient _, ArgumentParser _) =>
     {
       Errors.UnsupportedArgument(key);
       return Task.FromResult(1);

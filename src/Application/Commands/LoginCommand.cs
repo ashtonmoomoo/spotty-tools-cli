@@ -1,4 +1,4 @@
-using Application.Spotify;
+using Application.Interfaces;
 using Application.CLI.Arguments;
 using Application.Handlers;
 
@@ -22,8 +22,8 @@ public class LoginCommand : Command
     }
   }
 
-  public override Func<Client, ArgumentParser, Task<int>> GetDispatcher()
+  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
-    return (Client c, ArgumentParser _) => LoginHandler.Dispatch(c);
+    return (IClient c, ArgumentParser _) => LoginHandler.Dispatch(c);
   }
 }

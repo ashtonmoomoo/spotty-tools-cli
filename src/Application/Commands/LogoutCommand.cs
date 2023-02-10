@@ -1,5 +1,5 @@
 using Application.Handlers;
-using Application.Spotify;
+using Application.Interfaces;
 using Application.CLI.Arguments;
 
 namespace Application.Commands;
@@ -22,8 +22,8 @@ public class LogoutCommand : Command
     }
   }
 
-  public override Func<Client, ArgumentParser, Task<int>> GetDispatcher()
+  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
-    return (Client client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client));
+    return (IClient client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client));
   }
 }

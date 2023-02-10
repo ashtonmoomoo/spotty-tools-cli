@@ -1,3 +1,5 @@
+using Application.CLI.Messages;
+
 using Application.Common.Exceptions;
 
 using Application.Common.Utilities.Encoding;
@@ -8,12 +10,14 @@ using Application.Common.Utilities.Web;
 
 using Application.Spotify.Responses;
 
-namespace Application.Spotify;
-public abstract class ClientAuth
-{
-  protected bool _isLoggedIn = false;
-  protected readonly HttpClient httpClient;
+using Application.Interfaces;
 
+namespace Application.Spotify;
+
+public class SpotifyAuth : IClientAuth
+{
+  private bool _isLoggedIn = false;
+  private readonly HttpClient _httpClient;
   private readonly string _clientId = Variables.RequireEnvVar("SPOTIFY_CLIENT_ID");
   private readonly string _clientSecret = Variables.RequireEnvVar("SPOTIFY_CLIENT_SECRET");
   private readonly string _redirectUri = Variables.RequireEnvVar("SPOTIFY_REDIRECT_URI");
@@ -24,7 +28,7 @@ public abstract class ClientAuth
   private AccessToken? _accessTokenResponse;
   private bool _refreshRequired = false;
 
-  protected string? AccessToken
+  private string? AccessToken
   {
     get
     {
@@ -32,25 +36,77 @@ public abstract class ClientAuth
     }
   }
 
-  protected ClientAuth(HttpClient client)
+  public SpotifyAuth(HttpClient client)
   {
-    this.httpClient = client;
-
+    this._httpClient = client;
     this._state = System.Guid.NewGuid().ToString();
   }
 
-  protected void PromptUser()
+  public bool IsLoggedIn()
+  {
+    return this._isLoggedIn;
+  }
+
+  public async Task Login()
+  {
+    if (!IsLoggedIn())
+    {
+      PromptUser();
+      await DoOAuthHandshake();
+      Info.LoginSuccess();
+    }
+  }
+
+  public void Logout()
+  {
+    ClearSession();
+  }
+
+  public async Task<T> AuthedRequest<T>(HttpMethod method, string link)
+  {
+    return await AuthedRequest<T>(method, link, null);
+  }
+
+  public async Task<T> AuthedRequest<T>(HttpMethod method, string link, string? body)
+  {
+    var request = new HttpRequestMessage(method, link);
+    if (body != null)
+    {
+      request.Content = new StringContent(body);
+    }
+
+    request.Headers.Add("Authorization", $"Bearer {this.AccessToken}");
+    var response = await Http.SendRequestAndParseAs<T>(request, _httpClient);
+    if (response == null)
+    {
+      throw new Exception();
+    }
+
+    return response;
+  }
+
+  public async Task PrepareSession()
+  {
+    LoadSessionIfExists();
+
+    if (this._refreshRequired)
+    {
+      await GetToken("refresh");
+    }
+  }
+
+  private void PromptUser()
   {
     Browser.Open($"{Constants.ACCOUNTS_BASE_URL}/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
   }
 
-  protected async Task DoOAuthHandshake()
+  private async Task DoOAuthHandshake()
   {
     GetAuthToken();
     await GetToken("access");
   }
 
-  protected void ClearSession()
+  private void ClearSession()
   {
     string storageDir = Storage.GetStorageLocation();
     string filePath = $"{storageDir}/.session";
@@ -73,16 +129,6 @@ public abstract class ClientAuth
     this._authToken = token;
   }
 
-  public async Task PrepareSession()
-  {
-    LoadSessionIfExists();
-
-    if (this._refreshRequired)
-    {
-      await GetToken("refresh");
-    }
-  }
-
   private async Task GetToken(string tokenType)
   {
     HttpRequestMessage? request = tokenType == "access"
@@ -100,7 +146,7 @@ public abstract class ClientAuth
     var encodedSecret = Base64.Encode(toEncode);
     request.Headers.Add("Authorization", $"Basic {encodedSecret}");
 
-    var tokenResponse = await Http.SendRequestAndParseAs<AccessToken>(request, this.httpClient);
+    var tokenResponse = await Http.SendRequestAndParseAs<AccessToken>(request, this._httpClient);
     if (tokenResponse == null)
     {
       throw new OAuthFlowException("Failed to parse token response");
@@ -136,7 +182,7 @@ public abstract class ClientAuth
     Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
   }
 
-  protected void LoadSessionIfExists()
+  private void LoadSessionIfExists()
   {
     string storageDir = Storage.GetStorageLocation();
     string? sessionJson = Read.ReadFile($"{storageDir}/.session");

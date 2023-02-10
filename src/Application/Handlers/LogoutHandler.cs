@@ -1,10 +1,11 @@
 using Application.CLI.Messages;
+using Application.Interfaces;
 
 namespace Application.Handlers;
 
 public class LogoutHandler
 {
-  public static int Dispatch(Application.Spotify.Client client)
+  public static int Dispatch(IClient client)
   {
     if (!client.IsLoggedIn())
     {

@@ -1,10 +1,11 @@
 using Application.CLI.Messages;
+using Application.Interfaces;
 
 namespace Application.Handlers;
 
 public class LoginHandler
 {
-  public static async Task<int> Dispatch(Application.Spotify.Client client)
+  public static async Task<int> Dispatch(IClient client)
   {
     if (!client.IsLoggedIn())
     {

@@ -1,3 +1,6 @@
+using Application.Interfaces;
+using Application.Spotify.Responses;
+
 namespace Application.Spotify;
 
 public class PageOptions
@@ -19,5 +22,24 @@ public class PageOptions
     }
 
     return qs;
+  }
+}
+
+public class Pagination
+{
+  public static async Task<List<T>> HandlePagination<T>(string firstPageLink, IClientAuth auth)
+  {
+    var results = new List<T>();
+    string? next = firstPageLink;
+
+    do
+    {
+      var page = await auth.AuthedRequest<Pagination<T>>(HttpMethod.Get, next);
+      results.AddRange(page.Items);
+      next = page.Next;
+    }
+    while (next != null);
+
+    return results;
   }
 }
