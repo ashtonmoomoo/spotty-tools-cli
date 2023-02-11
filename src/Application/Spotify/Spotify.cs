@@ -34,23 +34,9 @@ public class SpotifyClient : IClient
 
   public async Task<List<TrackWithAddedAt>> GetPlaylistTracks(string playlistId)
   {
-    string link = $"{Constants.API_BASE_URL}/playlists/{playlistId}";
-
-    var result = new List<TrackWithAddedAt>();
-
-    var playlist = await auth.AuthedRequest<Playlist>(HttpMethod.Get, link);
-    var tracksPage = playlist.Tracks;
-
-    result.AddRange(tracksPage.Items);
-    if (tracksPage.Next == null)
-    {
-      return result;
-    }
-
-    var restOfTracks = await Pagination.HandlePagination<TrackWithAddedAt>(tracksPage.Next, auth);
-    result.AddRange(restOfTracks);
-
-    return result;
+    var options = new PageOptions() { Limit = 50, Offset = 0 };
+    string firstPage = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?{options.QueryString()}";
+    return await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
   }
 
   public async Task<List<PlaylistLite>> GetPlaylists()
