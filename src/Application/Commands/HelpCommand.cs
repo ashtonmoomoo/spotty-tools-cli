@@ -3,25 +3,19 @@ using Application.CLI.Arguments;
 
 namespace Application.Commands;
 
-public class HelpCommand : Command
+public class HelpCommand : ICommand
 {
-  public override string Alias
+  public string Alias
   {
-    get
-    {
-      return "help";
-    }
+    get => "help";
   }
 
-  public override string Description
+  public string Description
   {
-    get
-    {
-      return "Show this message.";
-    }
+    get => "Show this message.";
   }
 
-  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
     return (IClient _, ArgumentParser _) =>
     {

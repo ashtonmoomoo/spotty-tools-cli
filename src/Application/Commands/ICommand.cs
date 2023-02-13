@@ -3,9 +3,9 @@ using Application.Interfaces;
 
 namespace Application.Commands;
 
-public abstract class Command
+public interface ICommand
 {
-  public abstract string Alias { get; }
-  public abstract string Description { get; }
-  public abstract Func<IClient, ArgumentParser, Task<int>> GetDispatcher();
+  public string Alias { get; }
+  public string Description { get; }
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher();
 };

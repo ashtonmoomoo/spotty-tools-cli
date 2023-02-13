@@ -4,25 +4,19 @@ using Application.CLI.Arguments;
 
 namespace Application.Commands;
 
-public class ExportCommand : Command
+public class ExportCommand : ICommand
 {
-  public override string Alias
+  public string Alias
   {
-    get
-    {
-      return "export";
-    }
+    get => "export";
   }
 
-  public override string Description
+  public string Description
   {
-    get
-    {
-      return "Export the specified resource.";
-    }
+    get => "Export the specified resource.";
   }
 
-  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
     return (IClient client, ArgumentParser argParser) => ExportHandler.Dispatch(client, argParser);
   }
