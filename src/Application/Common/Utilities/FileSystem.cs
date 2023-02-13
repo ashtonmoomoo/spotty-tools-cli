@@ -1,6 +1,5 @@
-using System.Runtime.InteropServices;
-
 using Application.Common.Utilities.Env;
+using Application.Interfaces;
 
 namespace Application.Common.Utilities.FileSystem;
 
@@ -28,15 +27,10 @@ class Read
   }
 }
 
-class Write
+public class FileWriter : IFileWriter
 {
-  public static void WriteToFile(string path, string content)
+  public void WriteText(string path, string content)
   {
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    {
-      throw new UnsupportedPlatformException();
-    }
-
     File.WriteAllText(path, content);
   }
 }
