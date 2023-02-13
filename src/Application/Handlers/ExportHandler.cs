@@ -1,4 +1,5 @@
 using Application.CLI.Arguments;
+using Application.CLI.Messages;
 using Application.Spotify.Responses;
 using Application.Spotify.Exceptions;
 using Application.Interfaces;
@@ -27,7 +28,9 @@ public class ExportHandler
         }
     }
 
-    return 0;
+    Errors.UnsupportedArgument(nextArg);
+
+    return 1;
   }
 
   private static async Task ExportPlaylist(string playlistName, string path, IClient client)
