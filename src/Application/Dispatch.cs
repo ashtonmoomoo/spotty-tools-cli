@@ -6,7 +6,7 @@ namespace Application.Dispatch;
 
 public class Dispatch
 {
-  public static Func<IClient, ArgumentParser, Task<int>> GetDispatcher(string key, Commands.ICommand[] allowedCommands)
+  public static Func<IClient, ArgumentParser, Task<int>> GetDispatcher(string key, ICommand[] allowedCommands)
   {
     foreach (var command in allowedCommands)
     {
