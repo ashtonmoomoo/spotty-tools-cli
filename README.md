@@ -19,7 +19,7 @@ Additionally, you will need a suitable `dotnet` runtime installed on your machin
 On MacOS with `brew` installed, doing `brew install dotnet@6` and `brew install —cask dotnet-sdk` should be sufficient.
 
 ### Using the tools
-Assuming you have `git clone`'d this repo, and you are in the root directory, you will be able to run the app by simply doing `dotnet run <args>`.
+Assuming you have `git clone`'d this repo, and you are in `src/Application`, you will be able to run the app by simply doing `dotnet run <args>`.
 (Once I actually build/bundle the application, this will change!)
 Typically, the first command you will run is `dotnet run login`, which will initialise the authorization flow where you can grant `spotty-tools-cli` access to your Spotify account.
 To see a list of available commands, do `dotnet run help`.
