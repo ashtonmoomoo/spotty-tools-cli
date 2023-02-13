@@ -70,7 +70,7 @@ public class AddHandler
     }
   }
 
-  private static List<string> GetTrackIdsFromAlbums(List<AlbumWithAddedAt> albums)
+  private static List<string> GetTrackIdsFromAlbums(List<Album> albums)
   {
     var allTrackIds = new List<string>();
 
@@ -78,7 +78,7 @@ public class AddHandler
     // doesn't actually require pagination
     foreach (var album in albums)
     {
-      allTrackIds.AddRange(album.Album.TracksPage.Items.Select(item => item.URI));
+      allTrackIds.AddRange(album.TracksPage.Items.Select(item => item.URI));
     }
 
     return allTrackIds;

@@ -32,11 +32,12 @@ public class SpotifyClient : IClient
     await auth.PrepareSession();
   }
 
-  public async Task<List<TrackWithAddedAt>> GetPlaylistTracks(string playlistId)
+  public async Task<List<Track>> GetPlaylistTracks(string playlistId)
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/playlists/{playlistId}/tracks?{options.QueryString()}";
-    return await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
+    var result = await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
+    return result.Select(track => track.Track).ToList();
   }
 
   public async Task<List<PlaylistLite>> GetPlaylists()
@@ -52,18 +53,20 @@ public class SpotifyClient : IClient
     await auth.AuthedRequest<PlaylistSnapshot>(HttpMethod.Post, url);
   }
 
-  public async Task<List<AlbumWithAddedAt>> GetAlbums()
+  public async Task<List<Album>> GetAlbums()
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/albums?{options.QueryString()}";
-    return await Pagination.HandlePagination<AlbumWithAddedAt>(firstPage, auth);
+    var results = await Pagination.HandlePagination<AlbumWithAddedAt>(firstPage, auth);
+    return results.Select(album => album.Album).ToList();
   }
 
-  public async Task<List<TrackWithAddedAt>> GetLibrary()
+  public async Task<List<Track>> GetLibrary()
   {
     var options = new PageOptions() { Limit = 50, Offset = 0 };
     string firstPage = $"{Constants.API_BASE_URL}/me/tracks?{options.QueryString()}";
-    return await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
+    var result = await Pagination.HandlePagination<TrackWithAddedAt>(firstPage, auth);
+    return result.Select(track => track.Track).ToList();
   }
 
   public async Task<User> GetCurrentUser()

@@ -18,15 +18,14 @@ public class CsvExporter
     return String.Join(",", sanitised);
   }
 
-  public static void WriteTracksToCsv(List<TrackWithAddedAt> tracks, string path)
+  public static void WriteTracksToCsv(List<Track> tracks, string path)
   {
     var csv = new System.Text.StringBuilder();
 
     csv.AppendLine("uri,name,album,artist");
 
-    foreach (var trackWithAddedAt in tracks)
+    foreach (var track in tracks)
     {
-      var track = trackWithAddedAt.Track;
       csv.AppendLine(GetTrackRow(track));
     }
 
