@@ -1,7 +1,9 @@
 using Application.CLI.Arguments;
+using Application.CLI.Messages;
 using Application.Spotify.Responses;
 using Application.Spotify.Exceptions;
 using Application.Interfaces;
+using Application.Common.Utilities.FileSystem;
 
 namespace Application.Handlers;
 
@@ -27,14 +29,17 @@ public class ExportHandler
         }
     }
 
-    return 0;
+    Errors.UnsupportedArgument(nextArg);
+
+    return 1;
   }
 
   private static async Task ExportPlaylist(string playlistName, string path, IClient client)
   {
     var playlistId = await FindPlaylistIdByName(playlistName, client);
     var tracks = await client.GetPlaylistTracks(playlistId);
-    Application.Spotify.Exporters.CsvExporter.WriteTracksToCsv(tracks, path);
+    var exporter = new Application.Spotify.Exporters.TrackToCsvExporter(new FileWriter());
+    exporter.Export(tracks.Select(t => t.Track).ToList(), path);
   }
 
   private static async Task<string> FindPlaylistIdByName(string playlistName, IClient client)

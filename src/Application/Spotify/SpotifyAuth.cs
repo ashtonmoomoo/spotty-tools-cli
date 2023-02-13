@@ -179,7 +179,7 @@ public class SpotifyAuth : IClientAuth
   {
     var sessionJsonString = System.Text.Json.JsonSerializer.Serialize(this._accessTokenResponse);
     string storageDir = Storage.GetStorageLocation();
-    Write.WriteToFile($"{storageDir}/.session", sessionJsonString);
+    new FileWriter().WriteText($"{storageDir}/.session", sessionJsonString);
   }
 
   private void LoadSessionIfExists()
