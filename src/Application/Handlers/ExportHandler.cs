@@ -39,7 +39,7 @@ public class ExportHandler
     var playlistId = await FindPlaylistIdByName(playlistName, client);
     var tracks = await client.GetPlaylistTracks(playlistId);
     var exporter = new Application.Spotify.Exporters.TrackToCsvExporter(new FileWriter());
-    exporter.Export(tracks.Select(t => t.Track).ToList(), path);
+    exporter.Export(tracks, path);
   }
 
   private static async Task<string> FindPlaylistIdByName(string playlistName, IClient client)
