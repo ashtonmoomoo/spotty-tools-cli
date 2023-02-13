@@ -4,25 +4,19 @@ using Application.CLI.Arguments;
 
 namespace Application.Commands;
 
-public class AddCommand : Command
+public class AddCommand : ICommand
 {
-  public override string Alias
+  public string Alias
   {
-    get
-    {
-      return "add";
-    }
+    get => "add";
   }
 
-  public override string Description
+  public string Description
   {
-    get
-    {
-      return "Add the specified items to a delegate resource.";
-    }
+    get => "Add the specified items to a delegate resource.";
   }
 
-  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
     return (IClient client, ArgumentParser argParser) => AddHandler.Dispatch(client, argParser);
   }

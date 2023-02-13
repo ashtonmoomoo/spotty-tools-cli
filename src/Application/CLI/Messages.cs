@@ -14,7 +14,7 @@ public static class Help
     Console.WriteLine("* Description *");
   }
 
-  private static void FormatCommandHelp(Application.Commands.Command command)
+  private static void FormatCommandHelp(Application.Commands.ICommand command)
   {
     Console.Write(command.Alias);
     Console.Write('\t');
@@ -23,7 +23,7 @@ public static class Help
     Console.WriteLine();
   }
 
-  public static void ShowHelp(Application.Commands.Command[] commands)
+  public static void ShowHelp(Application.Commands.ICommand[] commands)
   {
     Header();
     foreach (var command in commands)

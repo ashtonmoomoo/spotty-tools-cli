@@ -4,25 +4,19 @@ using Application.Handlers;
 
 namespace Application.Commands;
 
-public class LoginCommand : Command
+public class LoginCommand : ICommand
 {
-  public override string Alias
+  public string Alias
   {
-    get
-    {
-      return "login";
-    }
+    get => "login";
   }
 
-  public override string Description
+  public string Description
   {
-    get
-    {
-      return "Login with your Spotify account.";
-    }
+    get => "Login with your Spotify account.";
   }
 
-  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
     return (IClient c, ArgumentParser _) => LoginHandler.Dispatch(c);
   }

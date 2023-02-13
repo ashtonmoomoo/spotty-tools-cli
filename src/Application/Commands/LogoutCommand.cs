@@ -4,25 +4,19 @@ using Application.CLI.Arguments;
 
 namespace Application.Commands;
 
-public class LogoutCommand : Command
+public class LogoutCommand : ICommand
 {
-  public override string Alias
+  public string Alias
   {
-    get
-    {
-      return "logout";
-    }
+    get => "logout";
   }
 
-  public override string Description
+  public string Description
   {
-    get
-    {
-      return "Delete your Spotify session.";
-    }
+    get => "Delete your Spotify session.";
   }
 
-  public override Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
+  public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
   {
     return (IClient client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client));
   }
