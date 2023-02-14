@@ -30,10 +30,7 @@ public class SpotifyAuth : IClientAuth
 
   private string? AccessToken
   {
-    get
-    {
-      return this._accessTokenResponse?.Token;
-    }
+    get => this._accessTokenResponse?.Token;
   }
 
   public SpotifyAuth(HttpClient client)
@@ -42,10 +39,7 @@ public class SpotifyAuth : IClientAuth
     this._state = System.Guid.NewGuid().ToString();
   }
 
-  public bool IsLoggedIn()
-  {
-    return this._isLoggedIn;
-  }
+  public bool IsLoggedIn() => this._isLoggedIn;
 
   public async Task Login()
   {
@@ -57,15 +51,10 @@ public class SpotifyAuth : IClientAuth
     }
   }
 
-  public void Logout()
-  {
-    ClearSession();
-  }
+  public void Logout() => ClearSession();
 
   public async Task<T> AuthedRequest<T>(HttpMethod method, string link)
-  {
-    return await AuthedRequest<T>(method, link, null);
-  }
+    => await AuthedRequest<T>(method, link, null);
 
   public async Task<T> AuthedRequest<T>(HttpMethod method, string link, string? body)
   {
@@ -96,9 +85,7 @@ public class SpotifyAuth : IClientAuth
   }
 
   private void PromptUser()
-  {
-    Browser.Open($"{Constants.ACCOUNTS_BASE_URL}/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
-  }
+    => Browser.Open($"{Constants.ACCOUNTS_BASE_URL}/authorize?client_id={_clientId}&response_type={_responseType}&redirect_uri={_redirectUri}&state={_state}&scope={_scopes}");
 
   private async Task DoOAuthHandshake()
   {
