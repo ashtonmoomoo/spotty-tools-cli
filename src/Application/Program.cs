@@ -21,8 +21,8 @@ public class Program
     }
 
     ArgumentParser argParser = new ArgumentParser(args);
-    string firstArg = argParser.NextArg();
+    string commandName = argParser.NextArg();
 
-    return await Dispatch.GetDispatcher(firstArg, Commands.AllowedCommands)(spotifyClient, argParser);
+    return await Dispatch.GetDispatcher(commandName, Commands.AllowedCommands)(spotifyClient, argParser);
   }
 }

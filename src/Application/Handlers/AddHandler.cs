@@ -65,9 +65,7 @@ public class AddHandler
   // Next layer has max length 11_000 (super batch)
   // Outer most layer has no max length
   private static IEnumerable<IEnumerable<string[]>> CreateSuperBatches(List<string> allTrackIds)
-  {
-    return allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
-  }
+    => allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
 
   private static async Task ProcessSuperBatch(IClient client, IEnumerable<string[]> superBatch, string playlistId, int numberOfBatches)
   {

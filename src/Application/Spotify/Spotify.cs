@@ -12,25 +12,13 @@ public class SpotifyClient : IClient
     this.auth = auth;
   }
 
-  public bool IsLoggedIn()
-  {
-    return auth.IsLoggedIn();
-  }
+  public bool IsLoggedIn() => auth.IsLoggedIn();
 
-  public async Task Login()
-  {
-    await auth.Login();
-  }
+  public async Task Login() => await auth.Login();
 
-  public void Logout()
-  {
-    auth.Logout();
-  }
+  public void Logout() => auth.Logout();
 
-  public async Task PrepareSession()
-  {
-    await auth.PrepareSession();
-  }
+  public async Task PrepareSession() => await auth.PrepareSession();
 
   public async Task<List<Track>> GetPlaylistTracks(string playlistId)
   {

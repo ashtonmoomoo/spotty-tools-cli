@@ -17,7 +17,5 @@ public class LoginCommand : ICommand
   }
 
   public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
-  {
-    return (IClient c, ArgumentParser _) => LoginHandler.Dispatch(c);
-  }
+    => (IClient c, ArgumentParser _) => LoginHandler.Dispatch(c);
 }
