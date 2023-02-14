@@ -1,8 +1,5 @@
 using Xunit;
 using Moq;
-using System.Linq;
-using System.Collections.Generic;
-
 using Application.Interfaces;
 using Application.Handlers;
 using Application.CLI.Arguments;

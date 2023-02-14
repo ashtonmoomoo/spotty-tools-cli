@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using Application.Spotify.Responses;
 
 namespace Tests.Factories;

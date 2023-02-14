@@ -1,5 +1,4 @@
 using Application.Spotify.Responses;
-using System.Collections.Generic;
 
 namespace Tests.Factories;
 
