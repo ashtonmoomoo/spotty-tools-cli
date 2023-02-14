@@ -1,8 +1,5 @@
 using Moq;
 using Xunit;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Application.Commands;
 using Application.Interfaces;
 using Application.CLI.Arguments;
 
