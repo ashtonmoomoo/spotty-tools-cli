@@ -1,5 +1,6 @@
 using Xunit;
 using Application.CLI.Arguments;
+using Application.Common.Exceptions;
 
 namespace Tests.CLI.Arguments;
 

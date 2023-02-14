@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Utilities.Env;
 using Application.CLI.Messages;
 
