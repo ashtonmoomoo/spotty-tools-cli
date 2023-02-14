@@ -1,5 +1,3 @@
-using Application.CLI.Arguments;
-
 namespace Application.CLI.Messages;
 
 public static class Help
@@ -14,7 +12,7 @@ public static class Help
     Console.WriteLine("* Description *");
   }
 
-  private static void FormatCommandHelp(Application.Commands.ICommand command)
+  private static void FormatCommandHelp(Application.Interfaces.ICommand command)
   {
     Console.Write(command.Alias);
     Console.Write('\t');
@@ -23,7 +21,7 @@ public static class Help
     Console.WriteLine();
   }
 
-  public static void ShowHelp(Application.Commands.ICommand[] commands)
+  public static void ShowHelp(Application.Interfaces.ICommand[] commands)
   {
     Header();
     foreach (var command in commands)

@@ -1,7 +1,6 @@
 using Application.CLI.Arguments;
-using Application.Interfaces;
 
-namespace Application.Commands;
+namespace Application.Interfaces;
 
 public interface ICommand
 {

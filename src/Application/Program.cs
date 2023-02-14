@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+﻿using Application.Commands;
 using Application.CLI.Messages;
 using Application.CLI.Arguments;
 using Application.Configuration;
@@ -23,6 +23,6 @@ public class Program
     ArgumentParser argParser = new ArgumentParser(args);
     string firstArg = argParser.NextArg();
 
-    return await Dispatch.GetDispatcher(firstArg)(spotifyClient, argParser);
+    return await Dispatch.GetDispatcher(firstArg, Commands.AllowedCommands)(spotifyClient, argParser);
   }
 }

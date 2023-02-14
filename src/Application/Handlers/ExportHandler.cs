@@ -9,7 +9,7 @@ namespace Application.Handlers;
 
 public class ExportHandler
 {
-  public static async Task<int> Dispatch(IClient client, ArgumentParser argParser)
+  public static async Task<int> Dispatch(IClient client, ArgumentParser argParser, IFileWriter writer)
   {
     if (!client.IsLoggedIn())
     {
@@ -24,7 +24,7 @@ public class ExportHandler
       case "playlist":
         {
           var playlistName = argParser.NextArg();
-          await ExportPlaylist(playlistName, argParser.NextArg(), client);
+          await ExportPlaylist(playlistName, argParser.NextArg(), client, writer);
           return 0;
         }
     }
@@ -34,12 +34,17 @@ public class ExportHandler
     return 1;
   }
 
-  private static async Task ExportPlaylist(string playlistName, string path, IClient client)
+  public static Task<int> Dispatch(IClient client, ArgumentParser argParser)
+  {
+    return Dispatch(client, argParser, new FileWriter());
+  }
+
+  private static async Task ExportPlaylist(string playlistName, string path, IClient client, IFileWriter fileWriter)
   {
     var playlistId = await FindPlaylistIdByName(playlistName, client);
     var tracks = await client.GetPlaylistTracks(playlistId);
-    var exporter = new Application.Spotify.Exporters.TrackToCsvExporter(new FileWriter());
-    exporter.Export(tracks.Select(t => t.Track).ToList(), path);
+    var exporter = new Application.Spotify.Exporters.TrackToCsvExporter(fileWriter);
+    exporter.Export(tracks, path);
   }
 
   private static async Task<string> FindPlaylistIdByName(string playlistName, IClient client)
