@@ -1,3 +1,5 @@
+using Application.Common.Exceptions;
+
 namespace Application.Common.Utilities.Env;
 
 class Variables

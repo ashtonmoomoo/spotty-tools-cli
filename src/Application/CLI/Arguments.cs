@@ -1,3 +1,5 @@
+using Application.Common.Exceptions;
+
 namespace Application.CLI.Arguments;
 
 public class ArgumentParser

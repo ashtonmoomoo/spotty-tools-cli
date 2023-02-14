@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
