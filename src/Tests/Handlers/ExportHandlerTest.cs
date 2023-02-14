@@ -81,7 +81,7 @@ public class ExportHandlerTests
     Assert.Equal(0, result);
 
     var invocations = mockFileWriter.Invocations;
-    Assert.Equal(1, invocations.Count());
+    Assert.Single(invocations);
 
     var invocationArgs = invocations[0].Arguments;
     Assert.Equal(mockPath, invocationArgs[0]);
