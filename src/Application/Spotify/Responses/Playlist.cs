@@ -9,7 +9,6 @@ public record class PlaylistLite(
   [property: JsonPropertyName("id")] string Id,
   [property: JsonPropertyName("name")] string Name,
   [property: JsonPropertyName("public")] bool Public,
-  [property: JsonPropertyName("tracks")] TracksLite Tracks,
   [property: JsonPropertyName("uri")] string Uri
 );
 
