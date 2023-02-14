@@ -18,7 +18,7 @@ public class PageFactory
       result.Add(
         new Pagination<T>(
           string.Empty,
-          items.GetRange(offset, limit).ToArray(),
+          items.Skip(offset).Take(limit).ToArray(),
           limit,
           string.Empty,
           offset,

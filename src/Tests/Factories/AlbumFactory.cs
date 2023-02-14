@@ -4,10 +4,10 @@ namespace Tests.Factories;
 
 public class AlbumFactory
 {
-  public static Album MakeAlbum(string name)
+  public static Album MakeAlbum(string name, int numberOfSongs)
   {
     var albumLite = MakeAlbumLite(name);
-    var albumTracks = new List<AlbumTrack>(AlbumTrackFactory.MakeAlbumTracks($"{name} album track", 10));
+    var albumTracks = new List<AlbumTrack>(AlbumTrackFactory.MakeAlbumTracks($"{name} album track", numberOfSongs));
     var albumTrackPage = PageFactory.PaginateItems<AlbumTrack>(albumTracks, 50)[0];
     return new Album(
       albumLite.Href,
@@ -17,6 +17,28 @@ public class AlbumFactory
       albumLite.URI,
       albumTrackPage
     );
+  }
+
+  public static Album MakeAlbum(string name)
+  {
+    return MakeAlbum(name, 10);
+  }
+
+  public static List<Album> MakeAlbums(string name, int numberOfAlbums)
+  {
+    return MakeAlbums(name, numberOfAlbums, 10);
+  }
+
+  public static List<Album> MakeAlbums(string name, int numberOfAlbums, int numberOfSongsPerAlbum)
+  {
+    var result = new List<Album>();
+
+    for (int i = 0; i < numberOfAlbums; i++)
+    {
+      result.Add(MakeAlbum($"{name} {i}", numberOfSongsPerAlbum));
+    }
+
+    return result;
   }
 
   public static AlbumLite MakeAlbumLite(string name)

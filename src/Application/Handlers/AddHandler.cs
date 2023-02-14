@@ -32,12 +32,56 @@ public class AddHandler
     return 0;
   }
 
-  public static async Task AddAlbumsToPlaylist(string playlistName, IClient client)
+  private static async Task AddAlbumsToPlaylist(string playlistName, IClient client)
   {
     var albums = await client.GetAlbums();
     var allTrackIds = GetTrackIdsFromAlbums(albums);
     var tracksCount = allTrackIds.Count();
+    if (tracksCount > Constants.Playlist.MAX_LENGTH)
+    {
+      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. Splitting into multiple playlists...");
+    }
 
+    List<string> playlistIds = await CreateDestinationPlaylists(playlistName, client, tracksCount);
+
+    IEnumerable<IEnumerable<string[]>> superBatches = CreateSuperBatches(allTrackIds);
+
+    await ProcessSuperBatches(client, playlistIds, superBatches);
+  }
+
+  private static async Task ProcessSuperBatches(IClient client, List<string> playlistIds, IEnumerable<IEnumerable<string[]>> superBatches)
+  {
+    var playlistIndex = 0;
+    foreach (var superBatch in superBatches)
+    {
+      var playlistId = playlistIds[playlistIndex];
+      var numberOfBatches = superBatch.Count();
+      await ProcessSuperBatch(client, superBatch, playlistId, numberOfBatches);
+      playlistIndex++;
+    }
+  }
+
+  // Inner array has max length 100 (batch)
+  // Next layer has max length 11_000 (super batch)
+  // Outer most layer has no max length
+  private static IEnumerable<IEnumerable<string[]>> CreateSuperBatches(List<string> allTrackIds)
+  {
+    return allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
+  }
+
+  private static async Task ProcessSuperBatch(IClient client, IEnumerable<string[]> superBatch, string playlistId, int numberOfBatches)
+  {
+    var progress = 0;
+    foreach (var batch in superBatch)
+    {
+      await client.AddSongsToPlaylist(batch.ToList(), playlistId);
+      progress++;
+      Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
+    }
+  }
+
+  private static async Task<List<string>> CreateDestinationPlaylists(string playlistName, IClient client, int tracksCount)
+  {
     var playlistIds = new List<string>();
     var numberOfPlaylists = System.Math.Ceiling(1f * tracksCount / Constants.Playlist.MAX_LENGTH);
     for (var i = 1; i <= numberOfPlaylists; i++)
@@ -46,28 +90,7 @@ public class AddHandler
       playlistIds.Add(id);
     }
 
-    if (tracksCount > Constants.Playlist.MAX_LENGTH)
-    {
-      Console.WriteLine($"{Constants.Playlist.MAX_LENGTH} songs is the max playlist length. Splitting into multiple playlists...");
-    }
-
-    var superBatches = allTrackIds.Chunk(Constants.Playlist.MAX_LENGTH).Select(c => c.Chunk(Constants.Playlist.MAX_SONGS_TO_ADD));
-    var playlistIndex = 0;
-    foreach (var superBatch in superBatches)
-    {
-      var playlistId = playlistIds[playlistIndex];
-      var numberOfBatches = superBatch.Count();
-
-      var progress = 0;
-      foreach (var batch in superBatch)
-      {
-        await client.AddSongsToPlaylist(batch.ToList(), playlistId);
-        progress++;
-        Console.WriteLine($"Processed {progress} / {numberOfBatches} batches...");
-      }
-
-      playlistIndex++;
-    }
+    return playlistIds;
   }
 
   private static List<string> GetTrackIdsFromAlbums(List<Album> albums)
