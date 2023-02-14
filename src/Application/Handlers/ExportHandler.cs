@@ -35,9 +35,7 @@ public class ExportHandler
   }
 
   public static Task<int> Dispatch(IClient client, ArgumentParser argParser)
-  {
-    return Dispatch(client, argParser, new FileWriter());
-  }
+    => Dispatch(client, argParser, new FileWriter());
 
   private static async Task ExportPlaylist(string playlistName, string path, IClient client, IFileWriter fileWriter)
   {
