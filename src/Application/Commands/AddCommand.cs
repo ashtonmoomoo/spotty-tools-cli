@@ -17,7 +17,5 @@ public class AddCommand : ICommand
   }
 
   public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
-  {
-    return (IClient client, ArgumentParser argParser) => AddHandler.Dispatch(client, argParser);
-  }
+    => (IClient client, ArgumentParser argParser) => AddHandler.Dispatch(client, argParser);
 }

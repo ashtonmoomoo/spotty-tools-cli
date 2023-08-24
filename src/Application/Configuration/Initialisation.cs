@@ -13,7 +13,7 @@ public class Initialisation
     }
   }
 
-  public static async Task StartUp(Application.Interfaces.IClient client)
+  public static async Task StartUp(Interfaces.IClient client)
   {
     CreateStorageLocationIfRequired();
     await client.PrepareSession();

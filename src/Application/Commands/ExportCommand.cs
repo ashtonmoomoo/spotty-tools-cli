@@ -17,7 +17,5 @@ public class ExportCommand : ICommand
   }
 
   public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
-  {
-    return (IClient client, ArgumentParser argParser) => ExportHandler.Dispatch(client, argParser);
-  }
+    => (IClient client, ArgumentParser argParser) => ExportHandler.Dispatch(client, argParser);
 }

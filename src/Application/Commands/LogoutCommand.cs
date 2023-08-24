@@ -17,7 +17,5 @@ public class LogoutCommand : ICommand
   }
 
   public Func<IClient, ArgumentParser, Task<int>> GetDispatcher()
-  {
-    return (IClient client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client));
-  }
+    => (IClient client, ArgumentParser _) => Task.FromResult(LogoutHandler.Dispatch(client));
 }
