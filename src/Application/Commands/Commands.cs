@@ -2,7 +2,7 @@ namespace Application.Commands;
 
 public class Commands
 {
-  public static readonly Application.Interfaces.ICommand[] AllowedCommands =
+  public static readonly Interfaces.ICommand[] AllowedCommands =
   {
     new LoginCommand(),
     new HelpCommand(),

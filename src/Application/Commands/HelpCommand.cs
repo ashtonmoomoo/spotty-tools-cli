@@ -19,7 +19,7 @@ public class HelpCommand : ICommand
   {
     return (IClient _, ArgumentParser _) =>
     {
-      Application.CLI.Messages.Help.ShowHelp(Commands.AllowedCommands);
+      CLI.Messages.Help.ShowHelp(Commands.AllowedCommands);
       return Task.FromResult(0);
     };
   }

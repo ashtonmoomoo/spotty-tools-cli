@@ -10,7 +10,7 @@ public class ExportPlaylistHandler
   {
     var playlistId = await FindPlaylistIdByName(playlistName, client);
     var tracks = await client.GetPlaylistTracks(playlistId);
-    var exporter = new Application.Spotify.Exporters.TrackToCsvExporter(fileWriter);
+    var exporter = new Spotify.Exporters.TrackToCsvExporter(fileWriter);
     exporter.Export(tracks, path);
 
     return 0;
